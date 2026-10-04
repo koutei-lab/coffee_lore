@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Coffee Aroma & Lore - 毎日のコーヒー知識帳</title>
+  
+  <!-- iOS Safari PWA & Web Clip Metas -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="日刊 珈琲の書">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="theme-color" content="#FDF8F5">
+  <link rel="apple-touch-icon" id="apple-touch-icon-link">
+  <link rel="manifest" id="manifest-link">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Google Fonts: Inter & Noto Serif JP -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            roast: {
+              50: '#FDF8F5',
+              100: '#F7EDE6',
+              200: '#EBD7CA',
+              300: '#DBBDA8',
+              400: '#C2987E',
+              500: '#A47455',
+              600: '#87563B',
+              700: '#693E28',
+              800: '#4E2B19',
+              900: '#32190E',
+              950: '#1F0D06',
+            },
+            espresso: '#1A110D',
+            crema: '#E6BA7E',
+          },
+          fontFamily: {
+            serif: ['"Noto Serif JP"', 'serif'],
+            sans: ['"Inter"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #FDF8F5;
+      color: #32190E;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+    .font-serif-jp {
+      font-family: 'Noto Serif JP', serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #F7EDE6;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #C2987E;
+      border-radius: 9999px;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(235, 215, 202, 0.6);
+    }
+    .badge-shimmer {
+      background-size: 200% 100%;
+      animation: shimmer 3s infinite linear;
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-roast-300 selection:text-roast-950">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- Navigation Header -->
+  <header class="sticky top-0 z-40 glass-card border-b border-roast-200">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('daily')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-roast-700 to-roast-900 flex items-center justify-center text-crema shadow-md shadow-roast-900/10">
+          <i class="fa-solid fa-mug-hot text-lg"></i>
+        </div>
+        <div>
+          <span class="text-xs font-semibold tracking-wider text-roast-500 uppercase block leading-none">Coffee Lore Daily</span>
+          <h1 class="text-lg font-bold text-roast-900 font-serif-jp tracking-tight">日刊 珈琲の書</h1>
+        </div>
+      </div>
+
+      <!-- Action items -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- iOS Safari Home Screen Guide Button -->
+        <button onclick="openIosGuideModal()" title="Safariでホーム画面に追加する方法" class="p-2.5 rounded-xl bg-crema/20 border border-crema/40 text-roast-900 hover:bg-crema/30 transition-all text-xs flex items-center gap-1.5 font-medium">
+          <i class="fa-solid fa-arrow-up-from-bracket text-xs text-roast-700"></i>
+          <span class="hidden sm:inline">ホーム画面に追加</span>
+        </button>
+
+        <div class="hidden sm:flex items-center text-xs font-medium bg-roast-100 text-roast-800 px-3 py-1.5 rounded-full border border-roast-200">
+          <i class="fa-regular fa-clock mr-1.5 text-roast-600"></i>
+          <span id="header-time-indicator">提示設定: 08:00</span>
+        </div>
+        
+        <button id="quick-notify-btn" onclick="triggerImmediateNotificationTest()" title="配信通知をテスト" class="p-2.5 rounded-xl bg-roast-100 text-roast-700 hover:bg-roast-200 hover:text-roast-900 transition-all text-sm flex items-center gap-1.5">
+          <i class="fa-regular fa-bell text-base"></i>
+          <span class="hidden md:inline text-xs font-semibold">通知テスト</span>
+        </button>
+
+        <button onclick="switchTab('settings')" title="設定" class="p-2.5 rounded-xl bg-roast-100 text-roast-700 hover:bg-roast-200 hover:text-roast-900 transition-all text-sm">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Tab navigation -->
+    <div class="flex items-center justify-between border-b border-roast-200 pb-2 overflow-x-auto no-scrollbar">
+      <div class="flex space-x-1 sm:space-x-2">
+        <button onclick="switchTab('daily')" id="tab-btn-daily" class="tab-btn active px-4 py-2 text-sm font-semibold rounded-lg transition-all flex items-center gap-2 bg-roast-800 text-white shadow-sm">
+          <i class="fa-solid fa-calendar-day"></i>
+          <span>今日の3知識</span>
+        </button>
+        <button onclick="switchTab('archive')" id="tab-btn-archive" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all flex items-center gap-2 text-roast-700 hover:bg-roast-100">
+          <i class="fa-solid fa-book-bookmark"></i>
+          <span>知識の書庫 (<span id="archive-count">0</span>)</span>
+        </button>
+        <button onclick="switchTab('gemini')" id="tab-btn-gemini" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all flex items-center gap-2 text-roast-700 hover:bg-roast-100">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i>
+          <span>AI バリスタ探求</span>
+        </button>
+        <button onclick="switchTab('settings')" id="tab-btn-settings" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all flex items-center gap-2 text-roast-700 hover:bg-roast-100">
+          <i class="fa-solid fa-sliders"></i>
+          <span>提示時間・設定</span>
+        </button>
+      </div>
+
+      <div class="text-xs text-roast-500 font-medium pl-3 hidden sm:block" id="current-date-badge">
+        2026年 読了率: <span id="progress-percent" class="font-bold text-roast-700">0%</span>
+      </div>
+    </div>
+
+    <!-- TAB 1: DAILY KNOWLEDGE -->
+    <section id="view-daily" class="tab-view block space-y-6">
+      <!-- Daily hero banner -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-roast-800 via-roast-900 to-black text-white p-6 sm:p-8 shadow-xl">
+        <div class="absolute -right-10 -bottom-10 opacity-10 text-white pointer-events-none text-9xl">
+          <i class="fa-solid fa-seedling"></i>
+        </div>
+        <div class="relative z-10 max-w-2xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-crema/20 border border-crema/30 text-crema text-xs font-semibold mb-3">
+            <i class="fa-solid fa-sparkles"></i>
+            <span>本日限定の厳選キュレーション</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-bold font-serif-jp mb-2 text-roast-50">今日の1杯を格上げする3つの知恵</h2>
+          <p class="text-roast-200 text-sm leading-relaxed mb-4">
+            コーヒーの香りと味わいの裏には、農園の風土や抽出の緻密な物理学、そして歴史のドラマがあります。今日の3選をじっくり味わってみましょう。
+          </p>
+          <div class="flex flex-wrap items-center gap-4 text-xs text-roast-300">
+            <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-crema"></i> 提示時間: <strong id="hero-schedule-display" class="text-white">08:00</strong></span>
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-book-open text-crema"></i> 全ての項目に出典・規格を明示</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards Container (3 daily items) -->
+      <div id="daily-cards-container" class="space-y-6">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Completion footer note -->
+      <div class="glass-card rounded-xl p-5 border border-roast-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg shrink-0">
+            <i class="fa-solid fa-award"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm text-roast-900">今日のノルマ達成度</h4>
+            <p class="text-xs text-roast-600">3つの知識を読んでチェックを入れると読了記録に保存されます。</p>
+          </div>
+        </div>
+        <button onclick="markAllTodayAsRead()" class="w-full sm:w-auto px-4 py-2 bg-roast-700 hover:bg-roast-800 text-white rounded-lg text-xs font-semibold shadow-sm transition">
+          すべて既読にする
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 2: ARCHIVE -->
+    <section id="view-archive" class="tab-view hidden space-y-6">
+      <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold font-serif-jp text-roast-900">知識の書庫 (アーカイブ)</h2>
+          <p class="text-xs text-roast-600">過去に提示された知識やお気に入りに保存した項目を検索・参照できます。</p>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <div class="relative flex-1 sm:w-64">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-roast-400 text-xs"></i>
+            <input type="text" id="archive-search" placeholder="キーワード・品種・抽出など検索..." oninput="filterArchive()" class="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-roast-200 bg-white focus:outline-none focus:ring-2 focus:ring-roast-500">
+          </div>
+          <select id="archive-filter" onchange="filterArchive()" class="text-xs py-2 px-3 rounded-lg border border-roast-200 bg-white text-roast-700 focus:outline-none focus:ring-2 focus:ring-roast-500">
+            <option value="all">すべて</option>
+            <option value="bookmarked">お気に入りのみ</option>
+            <option value="read">読了済み</option>
+            <option value="unread">未読</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="archive-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- TAB 3: AI BARISTA (GEMINI POWERED) -->
+    <section id="view-gemini" class="tab-view hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 border border-roast-200">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 text-white flex items-center justify-center text-xl shrink-0 shadow-md">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold font-serif-jp text-roast-900">AI バリスタ＆コーヒーサイエンティスト</h3>
+            <p class="text-xs text-roast-600 mt-1 leading-relaxed">
+              Google Gemini 3 Flashモデルが、コーヒーの疑問について出典や根拠となる抽出理論を交えて回答します。気になるトピックを掘り下げてみましょう。
+            </p>
+          </div>
+        </div>
+
+        <!-- Predefined query pills -->
+        <div class="mt-4 pt-4 border-t border-roast-100">
+          <span class="text-xs font-semibold text-roast-500 block mb-2">おすすめの質問：</span>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="setAiQuery('ペーパードリップで微粉が抽出に与える影響とチャネリングの対策')" class="text-xs px-3 py-1.5 rounded-full bg-roast-100 hover:bg-roast-200 text-roast-800 transition">
+              ☕ 微粉とチャネリング対策
+            </button>
+            <button onclick="setAiQuery('ゲイシャ種（Geisha）が脚光を浴びた歴史とパナマ・エスメラルダ農園の経緯')" class="text-xs px-3 py-1.5 rounded-full bg-roast-100 hover:bg-roast-200 text-roast-800 transition">
+              🌱 パナマ・ゲイシャの歴史
+            </button>
+            <button onclick="setAiQuery('アナエロビック・ファーメンテーション（嫌気性発酵）の科学的メカニズム')" class="text-xs px-3 py-1.5 rounded-full bg-roast-100 hover:bg-roast-200 text-roast-800 transition">
+              🔬 嫌気性発酵の仕組み
+            </button>
+            <button onclick="setAiQuery('水温92℃と85℃で抽出される化合物の違いとテイストプロファイル')" class="text-xs px-3 py-1.5 rounded-full bg-roast-100 hover:bg-roast-200 text-roast-800 transition">
+              💧 湯温による成分変化
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat form -->
+        <div class="mt-5 space-y-3">
+          <div class="relative">
+            <textarea id="ai-query-input" rows="3" placeholder="質問したいコーヒーの疑問を入力してください（例: 水質とTDSがエスプレッソのクレマに与える影響について、文献を交えて教えて）" class="w-full text-xs sm:text-sm p-3 rounded-xl border border-roast-200 focus:outline-none focus:ring-2 focus:ring-roast-600 bg-white resize-none"></textarea>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] text-roast-400">※ 学術的背景・SCA規格・専門書を元に回答します</span>
+            <button id="ai-submit-btn" onclick="askAiBarista()" class="px-5 py-2.5 bg-roast-800 hover:bg-roast-900 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-2">
+              <span>質問する</span>
+              <i class="fa-solid fa-paper-plane text-xs"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Response Box -->
+      <div id="ai-response-card" class="glass-card rounded-2xl p-6 border border-roast-200 hidden">
+        <div class="flex items-center justify-between border-b border-roast-100 pb-3 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs font-bold text-roast-700">バリスタからの回答 &amp; 参考文献</span>
+          </div>
+          <button onclick="copyAiResponse()" class="text-xs text-roast-500 hover:text-roast-800 flex items-center gap-1">
+            <i class="fa-regular fa-copy"></i>
+            <span>コピー</span>
+          </button>
+        </div>
+        <div id="ai-response-content" class="text-xs sm:text-sm leading-relaxed text-roast-900 space-y-3 prose max-w-none">
+          <!-- Streamed or rendered text -->
+        </div>
+        <div id="ai-sources-container" class="mt-4 pt-3 border-t border-roast-100 text-xs text-roast-600 hidden">
+          <strong class="text-roast-800 block mb-1">参照ソース / 出典リンク:</strong>
+          <ul id="ai-sources-list" class="list-disc pl-4 space-y-1"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: SETTINGS & SCHEDULE -->
+    <section id="view-settings" class="tab-view hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 border border-roast-200 space-y-6">
+        <div>
+          <h2 class="text-xl font-bold font-serif-jp text-roast-900">提示・通知時間の設定</h2>
+          <p class="text-xs text-roast-600 mt-1">
+            毎日3つの新しい知識をお届けする時間（リフレッシュ時刻）を指定できます。モーニングコーヒーの時間や休憩時間に合わせて調整してください。
+          </p>
+        </div>
+
+        <!-- Schedule form -->
+        <div class="bg-white p-5 rounded-xl border border-roast-200 space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+            <div>
+              <label for="schedule-time-picker" class="block text-xs font-bold text-roast-800 uppercase tracking-wider mb-1">
+                毎日の提示希望時刻
+              </label>
+              <div class="relative">
+                <input type="time" id="schedule-time-picker" class="w-full px-4 py-2.5 text-base font-semibold text-roast-900 border border-roast-300 rounded-lg focus:ring-2 focus:ring-roast-600 focus:outline-none">
+              </div>
+              <p class="text-[11px] text-roast-500 mt-1">※ 設定時刻を迎えると自動的に本日の新しい知識がアンロック・更新されます。</p>
+            </div>
+
+            <!-- Quick presets -->
+            <div>
+              <label class="block text-xs font-bold text-roast-800 uppercase tracking-wider mb-1">
+                定番のコーヒータイムから選ぶ
+              </label>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="setPresetTime('07:30')" class="px-3 py-2 text-xs bg-roast-50 hover:bg-roast-100 border border-roast-200 rounded-lg text-roast-800 font-medium text-left">
+                  🌅 7:30 (朝の1杯)
+                </button>
+                <button type="button" onclick="setPresetTime('12:30')" class="px-3 py-2 text-xs bg-roast-50 hover:bg-roast-100 border border-roast-200 rounded-lg text-roast-800 font-medium text-left">
+                  ☀️ 12:30 (昼休み)
+                </button>
+                <button type="button" onclick="setPresetTime('15:00')" class="px-3 py-2 text-xs bg-roast-50 hover:bg-roast-100 border border-roast-200 rounded-lg text-roast-800 font-medium text-left">
+                  ☕ 15:00 (おやつ休憩)
+                </button>
+                <button type="button" onclick="setPresetTime('20:00')" class="px-3 py-2 text-xs bg-roast-50 hover:bg-roast-100 border border-roast-200 rounded-lg text-roast-800 font-medium text-left">
+                  🌙 20:00 (夜の読書)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-roast-100 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="browser-notify-toggle" class="w-4 h-4 text-roast-700 rounded border-roast-300 focus:ring-roast-500 cursor-pointer">
+              <label for="browser-notify-toggle" class="text-xs font-semibold text-roast-800 cursor-pointer">
+                ブラウザ通知を有効にする（指定時刻にデスクトップ／スマホに通知）
+              </label>
+            </div>
+            <button onclick="saveScheduleSettings()" class="px-5 py-2.5 bg-roast-800 hover:bg-roast-900 text-white text-xs font-bold rounded-lg shadow transition">
+              設定を保存する
+            </button>
+          </div>
+        </div>
+
+        <!-- Simulation & Diagnostic -->
+        <div class="bg-roast-50 p-5 rounded-xl border border-roast-200 space-y-3">
+          <h3 class="text-xs font-bold text-roast-900 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-flask text-roast-600"></i>
+            動作確認 &amp; シミュレーション
+          </h3>
+          <p class="text-xs text-roast-600">
+            時間を待たずに通知の見た目を確認したり、翌日分の知識を先読みテストできます。
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="triggerImmediateNotificationTest()" class="px-4 py-2 bg-white border border-roast-300 hover:bg-roast-100 text-roast-800 text-xs rounded-lg font-medium transition flex items-center gap-1.5">
+              <i class="fa-solid fa-bell text-amber-600"></i>
+              <span>通知メッセージを今すぐテスト</span>
+            </button>
+            <button onclick="cycleNextDayKnowledge()" class="px-4 py-2 bg-white border border-roast-300 hover:bg-roast-100 text-roast-800 text-xs rounded-lg font-medium transition flex items-center gap-1.5">
+              <i class="fa-solid fa-forward-step text-roast-600"></i>
+              <span>別の日の3知識に切り替え</span>
+            </button>
+            <button onclick="resetAllLearnedState()" class="px-4 py-2 bg-white border border-red-200 hover:bg-red-50 text-red-700 text-xs rounded-lg font-medium transition flex items-center gap-1.5">
+              <i class="fa-solid fa-rotate-left"></i>
+              <span>学習履歴のリセット</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- About Sources & Methodology -->
+        <div class="p-5 rounded-xl bg-white border border-roast-200 text-xs text-roast-700 space-y-2">
+          <h4 class="font-bold text-roast-900 text-sm font-serif-jp flex items-center gap-2">
+            <i class="fa-solid fa-book-journal-whills text-roast-600"></i>
+            出典・文献の取り扱い方針について
+          </h4>
+          <p class="leading-relaxed">
+            当アプリで提示されるコーヒー知識は、主観的な嗜好の押し付けではなく、科学的知見および国際的に認められた基準に準拠しています。
+          </p>
+          <ul class="list-disc pl-5 space-y-1 text-roast-600">
+            <li><strong>SCA (Specialty Coffee Association)</strong>: 抽出の標準規格（Gold Cup Standard）やカッピングプロトコル</li>
+            <li><strong>SCAJ (日本スペシャルティコーヒー協会)</strong>: カッパー・マイスター教本および品質基準</li>
+            <li><strong>権威ある専門文献</strong>: ジェームズ・ホフマン著『The World Atlas of Coffee』、スコット・ラオ著『The Coffee Roaster's Companion』等</li>
+            <li><strong>学術論文</strong>: UC Davis Coffee Center や Coffee Science Foundation による抽出化学論文</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Deep Dive Modal -->
+  <div id="detail-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white max-w-2xl w-full rounded-2xl shadow-2xl border border-roast-200 max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div class="p-5 border-b border-roast-100 flex items-center justify-between bg-roast-50">
+        <div class="flex items-center gap-2">
+          <span id="modal-category-badge" class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-roast-200 text-roast-800">カテゴリ</span>
+          <span id="modal-day-badge" class="text-xs text-roast-500 font-semibold">知識 #01</span>
+        </div>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white hover:bg-roast-200 text-roast-600 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto custom-scrollbar space-y-5 text-roast-900">
+        <div>
+          <h3 id="modal-title" class="text-xl sm:text-2xl font-bold font-serif-jp text-roast-900 mb-2">タイトル</h3>
+          <p id="modal-summary" class="text-sm font-medium text-roast-600 leading-relaxed">概要</p>
+        </div>
+
+        <div class="bg-roast-50/80 p-4 rounded-xl border border-roast-200 space-y-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-roast-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-microscope text-roast-600"></i>
+            詳細な解説と科学的・技術的根拠
+          </h4>
+          <div id="modal-full-explanation" class="text-xs sm:text-sm text-roast-800 leading-relaxed space-y-2">
+            <!-- Full details -->
+          </div>
+        </div>
+
+        <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200/80 space-y-1">
+          <h4 class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+            <i class="fa-solid fa-lightbulb text-amber-600"></i>
+            明日から試せるバリスタの実践ヒント
+          </h4>
+          <p id="modal-barista-tip" class="text-xs sm:text-sm text-amber-950 leading-relaxed"></p>
+        </div>
+
+        <!-- Citation block -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-1">
+          <h4 class="font-bold text-slate-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-bookmark text-slate-600"></i>
+            正式な出典・参考文献
+          </h4>
+          <p id="modal-citation-title" class="font-semibold text-slate-900"></p>
+          <p id="modal-citation-detail" class="text-slate-600 text-[11px]"></p>
+          <div id="modal-citation-link-box" class="pt-1">
+            <!-- Link if available -->
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-roast-100 bg-roast-50 flex items-center justify-between">
+        <button id="modal-bookmark-btn" onclick="toggleCurrentModalBookmark()" class="px-4 py-2 rounded-lg text-xs font-semibold border border-roast-300 hover:bg-white transition flex items-center gap-1.5 text-roast-700">
+          <i class="fa-regular fa-star"></i>
+          <span>お気に入り登録</span>
+        </button>
+        <button onclick="askAiAboutCurrentModal()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-roast-800 hover:bg-roast-900 text-white transition flex items-center gap-1.5">
+          <i class="fa-solid fa-wand-magic-sparkles text-crema"></i>
+          <span>この知識をAIにさらに質問</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- iOS Safari Add to Home Screen Modal -->
+  <div id="ios-guide-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4">
+    <div class="bg-white max-w-md w-full rounded-2xl shadow-2xl border border-roast-200 p-6 space-y-4 animate-in slide-in-from-bottom duration-200">
+      <div class="flex items-center justify-between border-b border-roast-100 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-roast-800 text-crema flex items-center justify-center text-sm">
+            <i class="fa-solid fa-mobile-screen"></i>
+          </div>
+          <h3 class="font-bold text-sm text-roast-900">Safariでアプリ化する方法</h3>
+        </div>
+        <button onclick="closeIosGuideModal()" class="w-7 h-7 rounded-full bg-roast-100 text-roast-600 hover:bg-roast-200 flex items-center justify-center">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <div class="text-xs text-roast-700 space-y-3 leading-relaxed">
+        <p>iPhoneやiPadのSafariで開いてホーム画面に追加すると、アドレスバーが消えて<strong>本物のアプリのように全画面で軽快に動作</strong>します。</p>
+        
+        <ol class="space-y-2.5 bg-roast-50 p-4 rounded-xl border border-roast-200 font-medium">
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-full bg-roast-800 text-white flex items-center justify-center text-[10px] shrink-0 mt-0.5">1</span>
+            <span>画面下部（または上部）の共有ボタン <i class="fa-solid fa-arrow-up-from-bracket text-blue-600 mx-1"></i> をタップします。</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-full bg-roast-800 text-white flex items-center justify-center text-[10px] shrink-0 mt-0.5">2</span>
+            <span>メニューを少し下にスクロールし、<strong>「ホーム画面に追加」</strong>をタップします。</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-full bg-roast-800 text-white flex items-center justify-center text-[10px] shrink-0 mt-0.5">3</span>
+            <span>右上の<strong>「追加」</strong>を押せば完了です！毎日のコーヒー時間にすぐアクセスできます。</span>
+          </li>
+        </ol>
+      </div>
+
+      <button onclick="closeIosGuideModal()" class="w-full py-2.5 bg-roast-800 hover:bg-roast-900 text-white text-xs font-bold rounded-xl shadow transition">
+        理解しました
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * マスターナレッジベース (出典付き厳選コーヒー知識)
+     * カテゴリ: 抽出科学, 品種・栽培, 精製プロセス, 焙煎化学, 歴史・文化, カッピング
+     */
+    const COFFEE_KNOWLEDGE_DATABASE = [
+      {
+        id: "ck-01",
+        category: "抽出科学",
+        categoryColor: "bg-blue-100 text-blue-800",
+        title: "「抽出率（EY: 18〜22%）」と「収率」の黄金律",
+        summary: "豆の可溶性成分のうち何パーセントをお湯に溶かし出すかを示す抽出率。高すぎると過抽出（エグみ・渋味）、低すぎると未抽出（鋭い酸味・青臭さ）が生じます。",
+        explanation: "コーヒー豆の重量の約28%は熱湯に溶け出す成分ですが、人間が美味と感じる適正範囲は18%〜22%とされています（SCA Gold Cup Standard）。これ以下だとクエン酸などの高抽出スピード成分ばかりでボディと甘みが不足し、22%を超えると後味に強烈な収れん味（アストリンジェンシー）をもたらすクロロゲン酸の分解産物や高分子有機酸が抽出されてしまいます。",
+        baristaTip: "湯温を上げすぎず（90〜93℃推奨）、挽き目を極端に細かくしすぎないことが過抽出防止の第1歩です。",
+        citation: {
+          title: "SCA Brewing Standard & The Coffee Brewing Handbook",
+          author: "Ted R. Lingle / Specialty Coffee Association",
+          year: "1995 / 2018改定",
+          note: "SCA公式の可溶成分抽出収率（Extraction Yield）と可溶性固形分濃度（TDS）の基準チャートより。"
+        }
+      },
+      {
+        id: "ck-02",
+        category: "精製プロセス",
+        categoryColor: "bg-emerald-100 text-emerald-800",
+        title: "嫌気性発酵（アナエロビック）が産む特異なフレーバーの正体",
+        summary: "密閉タンクで酸素を遮断して発酵させる嫌気性発酵。乳酸菌や酵母が優勢になり、シナモンや赤ワインのような複雑な芳香が生まれます。",
+        explanation: "従来の開放型ウォッシュド精製では好気性微生物が活発ですが、密閉バルブ付きタンクで二酸化炭素を充填・滞留させると酸素呼吸微生物が抑えられ、乳酸菌（Lactobacillus等）や特定サッカロミセス酵母が活発になります。これにより乳酸発酵が進み、独特のクリーミーなマウスフィールやトロピカルフルーツ、スパイスのような発酵由来の揮発性エステル類が生成されます。",
+        baristaTip: "アナエロビック豆はフレーバーが非常に強いので、普段より少し湯温を下げて（88〜90℃）抽出し、揮発成分の立ち上がりを優しく楽しむのがコツです。",
+        citation: {
+          title: "Coffee Fermentation: From Raw Beans to Cup Quality",
+          author: "Luc De Vuyst et al. (Frontiers in Microbiology)",
+          year: "2020",
+          note: "コーヒーチェリー発酵工程における微生物群集遷移と揮発性芳香化合物の生成に関する包括的研究。"
+        }
+      },
+      {
+        id: "ck-03",
+        category: "品種・栽培",
+        categoryColor: "bg-amber-100 text-amber-800",
+        title: "「パナマ・ゲイシャ」の起源はエチオピアの原種林にある",
+        summary: "2004年にBest of Panamaで世界を震撼させたゲイシャ種。実はエチオピア南西部のゲシャ（Gesha）村周辺で1930年代に採取された自生種でした。",
+        explanation: "1931年に英国領事リチャード・ウォーリーらがエチオピアのゲシャ林で種子を採取し、ケニア・タンザニアを経て中米コスタリカのCATIE（熱帯農業研究高等教育センター）に持ち込まれました。当時はさび病への耐性実験用としてパナマに配布されましたが、低標高では収量が少なく味覚も評価されず放置されていました。2000年代初頭、ハシエンダ・ラ・エスメラルダ農園が標高1,600m超の高地で育てたところ、ジャスミンやベルガモットのような圧倒的な芳香が目覚めました。",
+        baristaTip: "ゲイシャを飲むときは、抽出直後の熱い状態だけでなく、50℃前後に冷めたときの華やかなアロマの開花に注目してください。",
+        citation: {
+          title: "The World Atlas of Coffee (2nd Edition)",
+          author: "James Hoffmann (ジェームズ・ホフマン)",
+          year: "2018",
+          note: "第2部「品種と栽培地域：パナマ及びエチオピア原種系谱の解説」。"
+        }
+      },
+      {
+        id: "ck-04",
+        category: "抽出科学",
+        categoryColor: "bg-blue-100 text-blue-800",
+        title: "抽出における水の役割：マグネシウムイオンとカルシウムイオン",
+        summary: "コーヒーの味の約98.5%は「水」。特に水中に含まれるMg2+（マグネシウム）とCa2+（カルシウム）のバランスが抽出フレーバーを決定します。",
+        explanation: "水中のミネラル（多価陽イオン）は、コーヒー豆の細胞壁からフルーティな有機酸や酸素原子を含む芳香化合物を引き抜くキレート作用（結合抽出力）を持ちます。特にマグネシウム（Mg2+）はクエン酸やリンゴ酸など明るい果実味の抽出を促進し、カルシウム（Ca2+）は重厚な質感やロースト感の抽出を強めます。一方で炭酸水素イオン（HCO3-）が過剰だと酸味が過度に中和され、フラットで退屈な味になります。",
+        baristaTip: "硬度が高すぎる（硬水）と酸味が消えて苦味が強調され、軟水すぎると酸味が尖りボディが薄くなります。市販の軟水（硬度30〜50mg/L程度）がドリップの基準点になります。",
+        citation: {
+          title: "Water for Coffee: Science Story Manual",
+          author: "Maxwell Colonna-Dashwood & Christopher H. Hendon",
+          year: "2015",
+          note: "バース大学の化学物理学者とバリスタ王者による水質とコーヒー抽出の科学的体系化書。"
+        }
+      },
+      {
+        id: "ck-05",
+        category: "焙煎化学",
+        categoryColor: "bg-orange-100 text-orange-800",
+        title: "メイラード反応とストレッカー分解が作り出す香気",
+        summary: "焙煎の黄色〜茶色変化（約150〜180℃）で起きるメイラード反応。還元糖とアミノ酸が複雑に結びつき、何百ものアロマ分子が誕生します。",
+        explanation: "生豆に含まれるスクロース（ショ糖）やアミノ酸は熱によってメイラード反応を起こし、ピラジン類（ナッツ・ロースト香）、フラン類（甘いキャラメル香）、ピロール類などを大量に生成します。さらにアミノ酸が脱炭酸・脱アミノ化するストレッカー分解によって、アルデヒド化合物が生まれ、複雑な奥行きが加わります。この時間帯（イエロー期から1ハゼ手前）の進行速度を制御することが、酸味とボディのバランスを司る焙煎士の腕の見せ所です。",
+        baristaTip: "浅煎りは生豆由来の果実酸と繊細なフローラルが残り、深煎りはメイラード反応とカラメル化による香ばしさと苦味が主役になります。",
+        citation: {
+          title: "The Craft and Science of Coffee",
+          author: "Britta Folmer (Academic Press / Nestlé Research)",
+          year: "2017",
+          note: "Chapter 11: The Chemistry of Roasting - Decoding Flavor Precursors."
+        }
+      },
+      {
+        id: "ck-06",
+        category: "歴史・文化",
+        categoryColor: "bg-purple-100 text-purple-800",
+        title: "ロンドンのカフェはかつて「ペニー大学」と呼ばれた",
+        summary: "17世紀の英国ロンドンに無数に誕生したコーヒーハウス。1ペニーを払ってコーヒーを飲むだけで、最新のニュースや学者・知識人の議論に参加できました。",
+        explanation: "当時、アルコールで濁った頭をクリアにし、理性的・論理的な対話を可能にする知的な飲料としてコーヒーが大流行しました。入場料1ペニーで新聞を読み、アイザック・ニュートンや王立協会の学者、商人、詩人たちが対等にディスカッションを交わしたことから「ペニー・ユニバーシティ（Penny University）」と称されました。世界最大の保険取引所「ロイズ」も、エドワード・ロイズのコーヒーハウスから誕生しています。",
+        baristaTip: "仕事や学習の前にコーヒーを飲む習慣は、17世紀のペニー大学時代から続く知的なルーティンそのものです。",
+        citation: {
+          title: "Coffee: A Dark History",
+          author: "Antony Wild (アントニー・ワイルド)",
+          year: "2005",
+          note: "近代社会におけるコーヒーハウス文化と金融・学問の近代化に関する歴史的検証。"
+        }
+      },
+      {
+        id: "ck-07",
+        category: "抽出科学",
+        categoryColor: "bg-blue-100 text-blue-800",
+        title: "チャネリング（Channeling）と微粉のバイパス現象",
+        summary: "粉層の不均一な間隙に湯が集中して流れるチャネリング。局所的な過抽出と全体の未抽出が同時に発生するドリップの天敵です。",
+        explanation: "粉の詰め方や注湯の勢いによって粉ベッドにクラック（割れ目）や空洞が生じると、水は抵抗の少ない道ばかりを通ります。その結果、その通路となった部分の粉からはエグみ・渋みが過剰抽出される一方、それ以外の大部分の粉は十分に湯と接触せず未抽出のままになり、酸っぱくて後味が苦いという最悪のカップバランスに陥ります。",
+        baristaTip: "蒸らし（ブルーミング）の際にすべての粉を均等に湿らせること、注湯を高い位置から落として粉ベッドを激しく掘り崩さないことが最大の予防策です。",
+        citation: {
+          title: "The Physics of Filter Coffee",
+          author: "Jonathan Gagné (ジョナサン・ガニエ)",
+          year: "2021",
+          note: "天体物理学者が流体力学と顕微鏡観測を用いてフィルターコーヒー抽出を数学的に解析した名著。"
+        }
+      },
+      {
+        id: "ck-08",
+        category: "品種・栽培",
+        categoryColor: "bg-amber-100 text-amber-800",
+        title: "アラビカ種とロブスタ種（カネフォラ種）の決定的な違い",
+        summary: "染色体数、カフェイン量、標高適正、そして病気耐性。両者は同じコーヒー属でも生物学的に全く異なる生態を持っています。",
+        explanation: "アラビカ種（Coffea arabica）は44本の染色体を持つ自己受粉植物で、標高1,000〜2,200mの高地冷涼な環境を好みます。繊細な酸味と芳香を持ちますが病気（さび病）に弱いです。対するロブスタ種（Coffea canephora）は22本の染色体を持つ他家受粉植物で、低地・高温多湿でも育ちます。カフェイン量はアラビカの約2倍あり、天然の防虫成分として働きます。クロロゲン酸量が多く焦げ麦のような重い苦味を持ち、エスプレッソのクレマ形成に重宝されます。",
+        baristaTip: "現在ではロブスタ種の高品質化（ファインロブスタ）も進んでおり、良質なものはチョコレートやローストナッツのような芳醇な魅力があります。",
+        citation: {
+          title: "Espresso Coffee: The Science of Quality",
+          author: "Andrea Illy & Rinantonio Viani (Academic Press)",
+          year: "2005",
+          note: "第2章: The Plant (Botanical species and agronomic characteristics)."
+        }
+      },
+      {
+        id: "ck-09",
+        category: "精製プロセス",
+        categoryColor: "bg-emerald-100 text-emerald-800",
+        title: "ハニープロセス（パルプドナチュラル）のカラー分類",
+        summary: "ホワイト、イエロー、レッド、ブラック。ミューシレージ（果肉の粘液質）の残す割合と乾燥時間によって風味が劇的に変化します。",
+        explanation: "コスタリカを中心に普及したハニープロセスでは、果皮を剥いた後にミューシレージ（糖度とペクチンを多く含む粘液）を残したまま天日乾燥させます。ミューシレージをほぼ除去して急速乾燥させるホワイトハニーはすっきりとしたウォッシュドに近い味わいに、50%以上残して日陰でじっくり2〜3週間乾燥させるブラックハニーはベリー系の濃厚な甘みとフルボディを備えます。",
+        baristaTip: "ハニープロセスの豆は糖度が高いため、ドリップ時にチャフ（シルバースキン）が残りやすく、少し粗めに挽くと雑味のないジューシーな甘さを引き出せます。",
+        citation: {
+          title: "SCAJ Specialty Coffee Handbook: Processing Methods",
+          author: "日本スペシャルティコーヒー協会 (SCAJ)",
+          year: "2019",
+          note: "中米諸国におけるミューシレージ残存率と乾燥制御によるカッププロファイル比較。"
+        }
+      }
+    ];
+
+    // アプリケーションの状態管理
+    const STORAGE_KEY = 'coffee_knowledge_state_v1';
+    
+    let appState = {
+      scheduleTime: '08:00', // デフォルトは朝8:00
+      notifyBrowser: false,
+      readHistory: {},       // { id: timestamp }
+      bookmarks: [],         // [ id, id, ... ]
+      dayOffset: 0,          // テスト用の日付オフセット
+      lastDeliveredDate: null
+    };
+
+    // 初期化とローカルストレージ復元
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          appState = { ...appState, ...JSON.parse(saved) };
+        }
+      } catch (e) {
+        console.error("Failed to load local state", e);
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {
+        console.error("Failed to save state", e);
+      }
+      updateUI();
+    }
+
+    /**
+     * 日付とオフセットに基づいて、その日の3つの知識を決定論的に抽出
+     */
+    function getTodayKnowledgeIndices() {
+      const today = new Date();
+      // 日付の整数値 (YYYYMMDD) + dayOffset
+      const daySeed = (today.getFullYear() * 1000) + 
+                      ((today.getMonth() + 1) * 31) + 
+                      today.getDate() + 
+                      (appState.dayOffset || 0);
+
+      const totalItems = COFFEE_KNOWLEDGE_DATABASE.length;
+      
+      // 重複しない3つのインデックスを計算
+      const idx1 = Math.abs(daySeed) % totalItems;
+      const idx2 = Math.abs(daySeed * 7 + 1) % totalItems;
+      let idx3 = Math.abs(daySeed * 13 + 2) % totalItems;
+      
+      // 被りを防止
+      while (idx2 === idx1) { idx2 = (idx2 + 1) % totalItems; }
+      while (idx3 === idx1 || idx3 === idx2) { idx3 = (idx3 + 1) % totalItems; }
+
+      return [idx1, idx2, idx3];
+    }
+
+    function getTodayItems() {
+      const indices = getTodayKnowledgeIndices();
+      return indices.map(i => COFFEE_KNOWLEDGE_DATABASE[i]);
+    }
+
+    function renderDailyCards() {
+      const container = document.getElementById('daily-cards-container');
+      const items = getTodayItems();
+      
+      container.innerHTML = items.map((item, index) => {
+        const isRead = !!appState.readHistory[item.id];
+        const isBookmarked = appState.bookmarks.includes(item.id);
+
+        return `
+          <div class="glass-card rounded-2xl p-5 sm:p-6 border transition-all duration-300 hover:shadow-lg ${isRead ? 'border-emerald-200/80 bg-emerald-50/20' : 'border-roast-200'}">
+            <!-- Card Header -->
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${item.categoryColor}">
+                  ${item.category}
+                </span>
+                <span class="text-xs text-roast-400 font-mono">Today's Lore #${index + 1}</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button onclick="toggleBookmark('${item.id}')" title="お気に入り" class="w-8 h-8 rounded-full flex items-center justify-center text-sm transition ${isBookmarked ? 'text-amber-500 bg-amber-50' : 'text-roast-400 hover:bg-roast-100'}">
+                  <i class="${isBookmarked ? 'fa-solid' : 'fa-regular'} fa-star"></i>
+                </button>
+                <button onclick="toggleReadState('${item.id}')" title="${isRead ? '未読に戻す' : '読了にする'}" class="px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 transition ${isRead ? 'bg-emerald-600 text-white shadow-sm' : 'bg-roast-100 text-roast-600 hover:bg-roast-200'}">
+                  <i class="fa-solid fa-check"></i>
+                  <span>${isRead ? '読了' : 'チェック'}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <h3 class="text-lg sm:text-xl font-bold font-serif-jp text-roast-900 mb-2 leading-snug cursor-pointer hover:text-roast-700 transition" onclick="openDetailModal('${item.id}')">
+              ${item.title}
+            </h3>
+            <p class="text-xs sm:text-sm text-roast-700 leading-relaxed mb-4">
+              ${item.summary}
+            </p>
+
+            <!-- Barista Tip Snippet -->
+            <div class="bg-roast-50/80 rounded-xl p-3 border border-roast-200/60 mb-4 flex items-start gap-2.5">
+              <i class="fa-solid fa-mug-saucer text-roast-500 mt-0.5 text-xs"></i>
+              <div class="text-xs text-roast-800">
+                <strong class="font-semibold text-roast-900">実践ヒント:</strong>
+                <span>${item.baristaTip}</span>
+              </div>
+            </div>
+
+            <!-- Card Footer: Citation & Deep Dive Action -->
+            <div class="pt-3 border-t border-roast-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+              <div class="flex items-center gap-1.5 text-roast-500 text-[11px] truncate max-w-full">
+                <i class="fa-solid fa-book text-roast-400"></i>
+                <span class="font-semibold text-roast-700">出典:</span>
+                <span class="truncate">${item.citation.title} (${item.citation.author})</span>
+              </div>
+              <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <button onclick="openDetailModal('${item.id}')" class="px-3 py-1.5 text-xs font-semibold text-roast-700 hover:text-roast-950 hover:bg-roast-100 rounded-lg transition flex items-center gap-1">
+                  <span>詳しく読む</span>
+                  <i class="fa-solid fa-angle-right text-[10px]"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderArchive() {
+      const grid = document.getElementById('archive-grid');
+      const searchQuery = (document.getElementById('archive-search')?.value || '').toLowerCase().trim();
+      const filterMode = document.getElementById('archive-filter')?.value || 'all';
+
+      const filtered = COFFEE_KNOWLEDGE_DATABASE.filter(item => {
+        const matchesSearch = 
+          item.title.toLowerCase().includes(searchQuery) ||
+          item.summary.toLowerCase().includes(searchQuery) ||
+          item.category.toLowerCase().includes(searchQuery) ||
+          item.citation.title.toLowerCase().includes(searchQuery);
+
+        if (!matchesSearch) return false;
+
+        const isRead = !!appState.readHistory[item.id];
+        const isBookmarked = appState.bookmarks.includes(item.id);
+
+        if (filterMode === 'bookmarked') return isBookmarked;
+        if (filterMode === 'read') return isRead;
+        if (filterMode === 'unread') return !isRead;
+        return true;
+      });
+
+      document.getElementById('archive-count').innerText = COFFEE_KNOWLEDGE_DATABASE.length;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-roast-400 space-y-2">
+            <i class="fa-regular fa-folder-open text-3xl"></i>
+            <p class="text-sm">条件に一致する知識は見つかりませんでした。</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const isRead = !!appState.readHistory[item.id];
+        const isBookmarked = appState.bookmarks.includes(item.id);
+
+        return `
+          <div class="glass-card rounded-xl p-4 border border-roast-200 flex flex-col justify-between hover:border-roast-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${item.categoryColor}">
+                  ${item.category}
+                </span>
+                <div class="flex items-center gap-1">
+                  <button onclick="toggleBookmark('${item.id}')" class="text-xs ${isBookmarked ? 'text-amber-500' : 'text-roast-300 hover:text-roast-600'}">
+                    <i class="${isBookmarked ? 'fa-solid' : 'fa-regular'} fa-star"></i>
+                  </button>
+                  ${isRead ? '<span class="text-[10px] text-emerald-600 font-semibold ml-1"><i class="fa-solid fa-check"></i> 読了</span>' : ''}
+                </div>
+              </div>
+              <h4 class="font-bold text-sm font-serif-jp text-roast-900 mb-1 hover:text-roast-600 cursor-pointer" onclick="openDetailModal('${item.id}')">
+                ${item.title}
+              </h4>
+              <p class="text-xs text-roast-600 line-clamp-2 leading-relaxed mb-3">
+                ${item.summary}
+              </p>
+            </div>
+            <div class="pt-2 border-t border-roast-100 flex items-center justify-between text-[11px] text-roast-500">
+              <span class="truncate max-w-[180px]">${item.citation.title}</span>
+              <button onclick="openDetailModal('${item.id}')" class="font-semibold text-roast-800 hover:underline">
+                詳細 <i class="fa-solid fa-arrow-right text-[9px]"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    let currentModalItemId = null;
+
+    function openIosGuideModal() {
+      document.getElementById('ios-guide-modal').classList.remove('hidden');
+    }
+
+    function closeIosGuideModal() {
+      document.getElementById('ios-guide-modal').classList.add('hidden');
+    }
+
+    // Dynamic Apple Touch Icon & Manifest Generator (Single-file PWA)
+    function setupSafariPwaAssets() {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 192;
+        canvas.height = 192;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // Background rounded rect
+          ctx.fillStyle = '#32190E';
+          ctx.beginPath();
+          ctx.roundRect(0, 0, 192, 192, 38);
+          ctx.fill();
+
+          // Coffee Icon Text
+          ctx.fillStyle = '#E6BA7E';
+          ctx.font = '90px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('☕', 96, 102);
+
+          const iconData = canvas.toDataURL('image/png');
+          const appleIconEl = document.getElementById('apple-touch-icon-link');
+          if (appleIconEl) appleIconEl.href = iconData;
+
+          // Inline Manifest blob
+          const manifestObj = {
+            name: "日刊 珈琲の書 - 毎日のコーヒー知識帳",
+            short_name: "珈琲の書",
+            start_url: "./",
+            display: "standalone",
+            background_color: "#FDF8F5",
+            theme_color: "#32190E",
+            icons: [
+              { src: iconData, sizes: "192x192", type: "image/png" }
+            ]
+          };
+          const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+          const manifestLink = document.getElementById('manifest-link');
+          if (manifestLink) manifestLink.href = URL.createObjectURL(manifestBlob);
+        }
+      } catch (err) {
+        console.warn("Could not generate PWA icons dynamically:", err);
+      }
+    }
+
+    function openDetailModal(itemId) {
+      const item = COFFEE_KNOWLEDGE_DATABASE.find(x => x.id === itemId);
+      if (!item) return;
+
+      currentModalItemId = itemId;
+      document.getElementById('modal-category-badge').innerText = item.category;
+      document.getElementById('modal-category-badge').className = `px-2.5 py-1 text-[11px] font-bold rounded-full ${item.categoryColor}`;
+      document.getElementById('modal-title').innerText = item.title;
+      document.getElementById('modal-summary').innerText = item.summary;
+      document.getElementById('modal-full-explanation').innerHTML = `<p>${item.explanation}</p>`;
+      document.getElementById('modal-barista-tip').innerText = item.baristaTip;
+      document.getElementById('modal-citation-title').innerText = item.citation.title;
+      document.getElementById('modal-citation-detail').innerText = `著者/機関: ${item.citation.author} (${item.citation.year}) - ${item.citation.note}`;
+
+      updateModalBookmarkButton();
+      document.getElementById('detail-modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('detail-modal').classList.add('hidden');
+      currentModalItemId = null;
+    }
+
+    function updateModalBookmarkButton() {
+      if (!currentModalItemId) return;
+      const isBookmarked = appState.bookmarks.includes(currentModalItemId);
+      const btn = document.getElementById('modal-bookmark-btn');
+      if (isBookmarked) {
+        btn.innerHTML = `<i class="fa-solid fa-star text-amber-500"></i><span>保存済み</span>`;
+      } else {
+        btn.innerHTML = `<i class="fa-regular fa-star"></i><span>お気に入り登録</span>`;
+      }
+    }
+
+    function toggleCurrentModalBookmark() {
+      if (!currentModalItemId) return;
+      toggleBookmark(currentModalItemId);
+      updateModalBookmarkButton();
+    }
+
+    function askAiAboutCurrentModal() {
+      if (!currentModalItemId) return;
+      const item = COFFEE_KNOWLEDGE_DATABASE.find(x => x.id === currentModalItemId);
+      closeModal();
+      switchTab('gemini');
+      setAiQuery(`「${item.title}」について、科学的背景や具体的な抽出での実践方法をさらに深掘りして教えてください。`);
+    }
+
+    function toggleBookmark(id) {
+      const idx = appState.bookmarks.indexOf(id);
+      if (idx > -1) {
+        appState.bookmarks.splice(idx, 1);
+        showToast("お気に入りから削除しました", "info");
+      } else {
+        appState.bookmarks.push(id);
+        showToast("お気に入りに追加しました⭐", "success");
+      }
+      saveState();
+    }
+
+    function toggleReadState(id) {
+      if (appState.readHistory[id]) {
+        delete appState.readHistory[id];
+        showToast("未読に戻しました", "info");
+      } else {
+        appState.readHistory[id] = Date.now();
+        showToast("知識を1つ習得しました！☕", "success");
+      }
+      saveState();
+    }
+
+    function markAllTodayAsRead() {
+      const items = getTodayItems();
+      items.forEach(item => {
+        appState.readHistory[item.id] = Date.now();
+      });
+      showToast("今日の3つの知識をすべて読了にしました！🎉", "success");
+      saveState();
+    }
+
+    function resetAllLearnedState() {
+      appState.readHistory = {};
+      appState.bookmarks = [];
+      saveState();
+      showToast("学習履歴をリセットしました", "info");
+    }
+
+    function filterArchive() {
+      renderArchive();
+    }
+
+    function saveScheduleSettings() {
+      const picker = document.getElementById('schedule-time-picker');
+      const notifyToggle = document.getElementById('browser-notify-toggle');
+
+      if (picker && picker.value) {
+        appState.scheduleTime = picker.value;
+      }
+      appState.notifyBrowser = !!notifyToggle?.checked;
+
+      if (appState.notifyBrowser && 'Notification' in window) {
+        if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+              showToast("ブラウザ通知の許可を受け付けました", "success");
+            }
+          });
+        }
+      }
+
+      saveState();
+      showToast(`毎日の提示時刻を「${appState.scheduleTime}」に更新しました`, "success");
+    }
+
+    function setPresetTime(timeStr) {
+      const picker = document.getElementById('schedule-time-picker');
+      if (picker) {
+        picker.value = timeStr;
+      }
+      appState.scheduleTime = timeStr;
+      saveScheduleSettings();
+    }
+
+    function triggerImmediateNotificationTest() {
+      const items = getTodayItems();
+      const firstTitle = items[0] ? items[0].title : "本日のコーヒー豆知識";
+      const message = `【本日の一杯に】「${firstTitle}」ほか3つの新しい知識が届きました！`;
+
+      // 1. In-app Toast
+      showToast(message, "coffee", 6000);
+
+      // 2. Web Notification (if supported & permitted)
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          new Notification("☕ 日刊 珈琲の書 (提示時刻)", {
+            body: message,
+            icon: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=128&auto=format&fit=crop&q=80"
+          });
+        } catch (e) {
+          console.warn("Notification error:", e);
+        }
+      } else if ('Notification' in window && Notification.permission !== 'denied') {
+        Notification.requestPermission();
+      }
+    }
+
+    function cycleNextDayKnowledge() {
+      appState.dayOffset = (appState.dayOffset || 0) + 1;
+      saveState();
+      showToast(`別の日の3知識に切り替えました (DAY+${appState.dayOffset})`, "info");
+    }
+
+    // バックグラウンド時刻監視タイマー
+    setInterval(() => {
+      const now = new Date();
+      const currentHours = String(now.getHours()).padStart(2, '0');
+      const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+      const currentTimeStr = `${currentHours}:${currentMinutes}`;
+      const todayDateStr = now.toISOString().slice(0, 10);
+
+      // 設定時刻と一致し、かつ今日まだ通知していない場合
+      if (currentTimeStr === appState.scheduleTime && appState.lastDeliveredDate !== todayDateStr) {
+        appState.lastDeliveredDate = todayDateStr;
+        saveState();
+        triggerImmediateNotificationTest();
+      }
+    }, 30000); // 30秒ごとにチェック
+
+    function setAiQuery(text) {
+      const input = document.getElementById('ai-query-input');
+      if (input) {
+        input.value = text;
+        input.focus();
+      }
+    }
+
+    async function askAiBarista() {
+      const input = document.getElementById('ai-query-input');
+      const query = input?.value.trim();
+      if (!query) {
+        showToast("質問を入力してください", "warning");
+        return;
+      }
+
+      const submitBtn = document.getElementById('ai-submit-btn');
+      const responseCard = document.getElementById('ai-response-card');
+      const responseContent = document.getElementById('ai-response-content');
+      const sourcesBox = document.getElementById('ai-sources-container');
+      const sourcesList = document.getElementById('ai-sources-list');
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i><span>抽出中...</span>`;
+      responseCard.classList.remove('hidden');
+      responseContent.innerHTML = `<p class="text-roast-500 italic">バリスタが学術文献と規格データを参照しています...</p>`;
+      sourcesBox.classList.add('hidden');
+      sourcesList.innerHTML = '';
+
+      const systemPrompt = `
+あなたは世界最高峰のQグレーダー兼コーヒーサイエンティストです。
+ユーザーからのコーヒーに関する専門的な疑問に回答してください。
+回答のルール:
+1. 科学的根拠（抽出率、水質、温度変化、化合物の生成など）を分かりやすく説明すること。
+2. 必ず最後に「■ 参照すべき専門文献・規格・論文」を明記すること（例: SCA Protocols, The World Atlas of Coffee, UC Davis Coffee Centerなど）。
+3. 最後に家庭や店舗で明日から試せる「バリスタのワンポイント」を添えること。
+4. Markdown形式で見やすく整理してください。
+`;
+
+      const apiKey = ""; // Canvas runtime injection
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+      const payload = {
+        contents: [{ parts: [{ text: query }] }],
+        tools: [{ "google_search": {} }],
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        }
+      };
+
+      try {
+        let attempts = 0;
+        let success = false;
+        let result = null;
+
+        while (attempts < 3 && !success) {
+          try {
+            const resp = await fetch(apiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            if (resp.ok) {
+              result = await resp.json();
+              success = true;
+            } else {
+              throw new Error(`HTTP error ${resp.status}`);
+            }
+          } catch (e) {
+            attempts++;
+            if (attempts >= 3) throw e;
+            await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempts)));
+          }
+        }
+
+        const candidate = result.candidates?.[0];
+        if (candidate && candidate.content?.parts?.[0]?.text) {
+          const rawText = candidate.content.parts[0].text;
+          
+          // Simple markdown parsing to clean HTML
+          const formatted = rawText
+            .replace(/### (.*?)\n/g, '<h4 class="font-bold text-base text-roast-900 mt-3 mb-1 font-serif-jp">$1</h4>')
+            .replace(/## (.*?)\n/g, '<h3 class="font-bold text-lg text-roast-900 mt-4 mb-2 font-serif-jp border-b border-roast-100 pb-1">$1</h3>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong class="text-roast-950 font-bold">$1</strong>')
+            .replace(/\n\n/g, '</p><p class="mt-2">')
+            .replace(/\n- (.*?)/g, '<li class="ml-4 list-disc text-roast-800">$1</li>');
+
+          responseContent.innerHTML = `<div class="space-y-2 leading-relaxed">${formatted}</div>`;
+
+          // Grounding Sources
+          let sources = [];
+          const groundingMetadata = candidate.groundingMetadata;
+          if (groundingMetadata && groundingMetadata.groundingAttributions) {
+            sources = groundingMetadata.groundingAttributions
+              .map(attr => ({
+                uri: attr.web?.uri,
+                title: attr.web?.title,
+              }))
+              .filter(s => s.uri && s.title);
+          }
+
+          if (sources.length > 0) {
+            sourcesBox.classList.remove('hidden');
+            sourcesList.innerHTML = sources.map(s => `
+              <li>
+                <a href="${s.uri}" target="_blank" rel="noopener noreferrer" class="text-roast-700 hover:text-roast-950 underline font-medium">
+                  ${s.title} <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-1"></i>
+                </a>
+              </li>
+            `).join('');
+          }
+        } else {
+          responseContent.innerHTML = `<p class="text-amber-800">回答の生成に失敗しました。もう一度お試しください。</p>`;
+        }
+      } catch (err) {
+        responseContent.innerHTML = `
+          <div class="p-3 bg-red-50 text-red-700 rounded-lg text-xs">
+            回答の取得中にエラーが発生しました。ネットワークまたは接続状態をご確認ください。
+          </div>
+        `;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>質問する</span><i class="fa-solid fa-paper-plane text-xs"></i>`;
+      }
+    }
+
+    function copyAiResponse() {
+      const content = document.getElementById('ai-response-content');
+      if (!content) return;
+      
+      const textarea = document.createElement('textarea');
+      textarea.value = content.innerText;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast("回答をクリップボードにコピーしました", "success");
+      } catch (err) {
+        showToast("コピーに失敗しました", "warning");
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-roast-800', 'text-white', 'shadow-sm');
+        btn.classList.add('text-roast-700', 'hover:bg-roast-100');
+      });
+
+      const targetView = document.getElementById(`view-${tabId}`);
+      const targetBtn = document.getElementById(`tab-btn-${tabId}`);
+
+      if (targetView) targetView.classList.remove('hidden');
+      if (targetBtn) {
+        targetBtn.classList.remove('text-roast-700', 'hover:bg-roast-100');
+        targetBtn.classList.add('bg-roast-800', 'text-white', 'shadow-sm');
+      }
+
+      if (tabId === 'archive') {
+        renderArchive();
+      }
+    }
+
+    function updateUI() {
+      // 1. Time indicators
+      const headerIndicator = document.getElementById('header-time-indicator');
+      const heroIndicator = document.getElementById('hero-schedule-display');
+      const timePicker = document.getElementById('schedule-time-picker');
+      const notifyToggle = document.getElementById('browser-notify-toggle');
+
+      if (headerIndicator) headerIndicator.innerText = `提示設定: ${appState.scheduleTime}`;
+      if (heroIndicator) heroIndicator.innerText = appState.scheduleTime;
+      if (timePicker && !timePicker.value) timePicker.value = appState.scheduleTime;
+      if (notifyToggle) notifyToggle.checked = !!appState.notifyBrowser;
+
+      // 2. Read Progress
+      const totalKnowledge = COFFEE_KNOWLEDGE_DATABASE.length;
+      const readCount = Object.keys(appState.readHistory).length;
+      const percent = Math.min(100, Math.round((readCount / totalKnowledge) * 100));
+      const progressEl = document.getElementById('progress-percent');
+      if (progressEl) progressEl.innerText = `${percent}% (${readCount}/${totalKnowledge})`;
+
+      // 3. Render cards
+      renderDailyCards();
+      renderArchive();
+    }
+
+    function showToast(message, type = 'info', duration = 3500) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto p-4 rounded-xl shadow-xl border flex items-center gap-3 transition-all duration-300 transform translate-y-2 opacity-0 text-xs sm:text-sm font-medium ${
+        type === 'success' ? 'bg-emerald-900 text-emerald-100 border-emerald-700' :
+        type === 'coffee' ? 'bg-roast-900 text-crema border-roast-700' :
+        type === 'warning' ? 'bg-amber-900 text-amber-100 border-amber-700' :
+        'bg-roast-800 text-white border-roast-600'
+      }`;
+
+      const icon = 
+        type === 'success' ? '<i class="fa-solid fa-circle-check text-emerald-400"></i>' :
+        type === 'coffee' ? '<i class="fa-solid fa-mug-hot text-crema"></i>' :
+        type === 'warning' ? '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i>' :
+        '<i class="fa-solid fa-circle-info text-roast-300"></i>';
+
+      toast.innerHTML = `
+        <div class="text-base shrink-0">${icon}</div>
+        <div class="flex-1 leading-snug">${message}</div>
+      `;
+
+      container.appendChild(toast);
+
+      // Animate in
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      // Animate out
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      updateUI();
+      setupSafariPwaAssets();
+
+      // Close modal on Escape
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeModal();
+          closeIosGuideModal();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
