@@ -44,7 +44,8 @@
 
   <style>
     :root {
-      font-size: 16px;
+      /* 基本フォントサイズを16pxから18pxへ底上げし、視認性を大幅向上 */
+      font-size: 18px;
     }
     html, body {
       max-width: 100vw;
@@ -65,7 +66,7 @@
       font-family: 'Noto Serif JP', Georgia, serif;
     }
     .glass-nav {
-      background: rgba(250, 246, 240, 0.94);
+      background: rgba(250, 246, 240, 0.95);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
@@ -78,7 +79,7 @@
       overflow-wrap: anywhere;
       word-break: break-word;
     }
-    /* タブバー：スマホ幅に100%均等フィットし文字サイズ変更時も固定寸法を維持 */
+    /* タブバー：指定箇所の寸法・文字サイズを厳格固定（文字サイズ変更時も崩れない） */
     .tab-bar-fixed {
       width: 100% !important;
     }
@@ -125,12 +126,12 @@
     <div class="max-w-4xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
       <!-- App Identity -->
       <div class="flex items-center space-x-2.5 cursor-pointer shrink-0" onclick="switchTab('daily')">
-        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-roast-700 to-roast-900 flex items-center justify-center text-crema shadow-sm shrink-0">
-          <i class="fa-solid fa-mug-hot text-base sm:text-lg"></i>
+        <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-roast-700 to-roast-900 flex items-center justify-center text-crema shadow-sm shrink-0">
+          <i class="fa-solid fa-mug-hot text-base sm:text-xl"></i>
         </div>
         <div class="min-w-0">
-          <span class="text-[10px] sm:text-xs font-semibold tracking-wider text-roast-500 uppercase block leading-none">Coffee Lore Daily</span>
-          <h1 class="text-base sm:text-lg font-bold text-roast-900 font-serif-jp tracking-tight truncate">日刊 珈琲の書</h1>
+          <span class="text-xs font-semibold tracking-wider text-roast-500 uppercase block leading-none">Coffee Lore Daily</span>
+          <h1 class="text-base sm:text-xl font-bold text-roast-900 font-serif-jp tracking-tight truncate">日刊 珈琲の書</h1>
         </div>
       </div>
 
@@ -143,22 +144,22 @@
             <i class="fa-solid fa-chevron-down text-[10px] text-roast-600 ml-0.5"></i>
           </button>
           
-          <div id="font-size-dropdown" class="hidden absolute right-0 mt-1.5 w-36 bg-white rounded-xl shadow-xl border border-roast-200 p-1.5 z-50 text-xs font-medium space-y-1">
-            <div class="px-2 py-1 text-[11px] text-roast-400 font-bold border-b border-roast-100 mb-1">文字の大きさ</div>
-            <button onclick="setFontSize('sm', true)" id="fs-btn-sm" class="w-full text-left px-2.5 py-1.5 rounded-md hover:bg-roast-100 flex items-center justify-between text-roast-800">
-              <span class="text-xs">小 (85%)</span>
+          <div id="font-size-dropdown" class="hidden absolute right-0 mt-1.5 w-40 bg-white rounded-xl shadow-xl border border-roast-200 p-1.5 z-50 text-xs font-medium space-y-1">
+            <div class="px-2 py-1 text-xs text-roast-400 font-bold border-b border-roast-100 mb-1">文字の大きさ</div>
+            <button onclick="setFontSize('sm', true)" id="fs-btn-sm" class="w-full text-left px-2.5 py-2 rounded-md hover:bg-roast-100 flex items-center justify-between text-roast-800">
+              <span class="text-xs">小 (16px)</span>
               <i class="fa-solid fa-check text-emerald-600 hidden check-icon"></i>
             </button>
-            <button onclick="setFontSize('md', true)" id="fs-btn-md" class="w-full text-left px-2.5 py-1.5 rounded-md hover:bg-roast-100 flex items-center justify-between text-roast-800">
-              <span class="text-sm font-semibold">標準 (100%)</span>
+            <button onclick="setFontSize('md', true)" id="fs-btn-md" class="w-full text-left px-2.5 py-2 rounded-md hover:bg-roast-100 flex items-center justify-between text-roast-800">
+              <span class="text-sm font-semibold">標準・大 (18px)</span>
               <i class="fa-solid fa-check text-emerald-600 hidden check-icon"></i>
             </button>
-            <button onclick="setFontSize('lg', true)" id="fs-btn-lg" class="w-full text-left px-2.5 py-1.5 rounded-md hover:bg-roast-100 flex items-center justify-between text-roast-800">
-              <span class="text-sm font-bold">大 (115%)</span>
+            <button onclick="setFontSize('lg', true)" id="fs-btn-lg" class="w-full text-left px-2.5 py-2 rounded-md hover:bg-roast-100 flex items-center justify-between text-roast-800">
+              <span class="text-base font-bold">特大 (20px)</span>
               <i class="fa-solid fa-check text-emerald-600 hidden check-icon"></i>
             </button>
-            <button onclick="setFontSize('xl', true)" id="fs-btn-xl" class="w-full text-left px-2.5 py-1.5 rounded-md hover:bg-roast-100 flex items-center justify-between text-roast-800">
-              <span class="text-base font-bold">特大 (130%)</span>
+            <button onclick="setFontSize('xl', true)" id="fs-btn-xl" class="w-full text-left px-2.5 py-2 rounded-md hover:bg-roast-100 flex items-center justify-between text-roast-800">
+              <span class="text-lg font-bold">極大 (22px)</span>
               <i class="fa-solid fa-check text-emerald-600 hidden check-icon"></i>
             </button>
           </div>
@@ -183,7 +184,7 @@
   <!-- Main Container -->
   <main class="flex-1 max-w-4xl mx-auto w-full px-3 sm:px-6 py-4 space-y-4 min-w-0">
 
-    <!-- Tab bar (スマホ幅に100%均等フィット) -->
+    <!-- Tab bar (スマホ幅に100%均等フィット・文字サイズ変更時も固定寸法を維持) -->
     <div class="w-full border-b border-roast-200 pb-2 tab-bar-fixed">
       <div class="flex items-center justify-between gap-2 w-full">
         <div class="grid grid-cols-4 gap-1 sm:gap-1.5 w-full sm:w-auto sm:flex sm:space-x-1.5">
@@ -205,8 +206,8 @@
           </button>
         </div>
 
-        <div class="text-[13px] text-roast-600 font-medium pl-2 hidden sm:block shrink-0">
-          全読了率: <span id="progress-percent" class="font-bold text-roast-800 text-[14px]">0%</span>
+        <div class="text-sm text-roast-600 font-medium pl-2 hidden sm:block shrink-0">
+          全読了率: <span id="progress-percent" class="font-bold text-roast-800 text-base">0%</span>
         </div>
       </div>
     </div>
@@ -214,28 +215,28 @@
     <!-- ==================== VIEW 1: DAILY 3 KNOWLEDGE ==================== -->
     <section id="view-daily" class="tab-view space-y-4">
       
-      <!-- 洗練された日付ナビゲーションバー（本日と前の日 ＋ Web同期ステータス） -->
+      <!-- 日付ナビゲーションバー（本日と前の日 ＋ Web同期ステータス） -->
       <div class="card-surface rounded-2xl p-3.5 sm:p-4 bg-gradient-to-r from-white via-roast-50/40 to-white shadow-sm border border-roast-200/90">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
           
           <!-- 日付・ステータス表示 -->
           <div class="flex items-center gap-3 w-full sm:w-auto">
-            <div class="w-10 h-10 rounded-xl bg-roast-100/80 border border-roast-200 flex items-center justify-center text-roast-800 shadow-2xs shrink-0">
-              <i class="fa-regular fa-calendar text-base text-roast-700"></i>
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-roast-100/80 border border-roast-200 flex items-center justify-center text-roast-800 shadow-2xs shrink-0">
+              <i class="fa-regular fa-calendar text-lg text-roast-700"></i>
             </div>
             <div class="min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
-                <span id="date-badge-status" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                <span id="date-badge-status" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
                   本日
                 </span>
-                <span id="date-day-offset-text" class="text-[11px] text-roast-500 font-medium"></span>
+                <span id="date-day-offset-text" class="text-xs text-roast-500 font-medium"></span>
                 <!-- Web収集バッジ -->
-                <span id="web-sync-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
-                  <i class="fa-solid fa-globe text-[9px] text-emerald-600"></i>
+                <span id="web-sync-badge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                  <i class="fa-solid fa-globe text-xs text-emerald-600"></i>
                   <span id="web-sync-text">Gemini Web収集済み</span>
                 </span>
               </div>
-              <h2 id="current-display-date" class="text-sm sm:text-base font-bold text-roast-900 font-serif-jp tracking-tight mt-0.5">
+              <h2 id="current-display-date" class="text-base sm:text-lg font-bold text-roast-900 font-serif-jp tracking-tight mt-0.5">
                 ----年--月--日
               </h2>
             </div>
@@ -244,19 +245,19 @@
           <!-- ナビゲーションスイッチ & 手動再取得ボタン -->
           <div class="flex items-center gap-1.5 bg-roast-100/90 p-1 rounded-xl border border-roast-200 w-full sm:w-auto justify-end">
             <!-- 前の日ボタン -->
-            <button onclick="navigateDay(-1)" id="btn-nav-prev" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 text-roast-700 hover:text-roast-950 hover:bg-white/80 active:bg-white">
-              <i class="fa-solid fa-arrow-left text-[11px] text-roast-500"></i>
+            <button onclick="navigateDay(-1)" id="btn-nav-prev" class="flex-1 sm:flex-initial px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 text-roast-700 hover:text-roast-950 hover:bg-white/80 active:bg-white">
+              <i class="fa-solid fa-arrow-left text-xs text-roast-500"></i>
               <span id="prev-btn-label">前の日</span>
             </button>
 
             <!-- 本日ボタン -->
-            <button onclick="goToToday()" id="btn-nav-today" class="flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-roast-800 text-white shadow-xs">
-              <i class="fa-solid fa-sun text-[11px] text-crema"></i>
+            <button onclick="goToToday()" id="btn-nav-today" class="flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-roast-800 text-white shadow-xs">
+              <i class="fa-solid fa-sun text-xs text-crema"></i>
               <span>本日</span>
             </button>
 
             <!-- Web再収集ボタン -->
-            <button onclick="forceRefreshDailyFromWeb()" title="GeminiとGoogle Searchで最新情報をネットから再収集" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1 bg-white hover:bg-roast-50 text-roast-800 border border-roast-300 shadow-2xs">
+            <button onclick="forceRefreshDailyFromWeb()" title="GeminiとGoogle Searchで最新情報をネットから再収集" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 bg-white hover:bg-roast-50 text-roast-800 border border-roast-300 shadow-2xs">
               <i id="sync-refresh-icon" class="fa-solid fa-arrows-rotate text-amber-600 text-xs"></i>
               <span class="hidden sm:inline">ネット更新</span>
             </button>
@@ -266,7 +267,7 @@
       </div>
 
       <!-- 3 Daily Cards Grid -->
-      <div id="daily-cards-container" class="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
+      <div id="daily-cards-container" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Rendered by JS -->
       </div>
     </section>
@@ -277,9 +278,9 @@
         <div class="flex flex-col sm:flex-row gap-2.5">
           <div class="relative flex-1">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-roast-400 text-sm"></i>
-            <input type="text" id="archive-search-input" oninput="filterArchive()" placeholder="90種類以上の知識やキーワードを検索..." class="w-full text-xs sm:text-sm pl-9 pr-3 py-2 rounded-lg border border-roast-200 focus:outline-none focus:ring-1 focus:ring-roast-600 bg-white">
+            <input type="text" id="archive-search-input" oninput="filterArchive()" placeholder="知識やキーワードを検索..." class="w-full text-sm pl-9 pr-3 py-2 rounded-lg border border-roast-200 focus:outline-none focus:ring-1 focus:ring-roast-600 bg-white">
           </div>
-          <select id="archive-category-select" onchange="filterArchive()" class="text-xs sm:text-sm px-3 py-2 rounded-lg border border-roast-200 bg-white text-roast-800 focus:outline-none">
+          <select id="archive-category-select" onchange="filterArchive()" class="text-sm px-3 py-2 rounded-lg border border-roast-200 bg-white text-roast-800 focus:outline-none">
             <option value="all">すべてのカテゴリ</option>
             <option value="extraction">第1章: 抽出・器具・流体力学</option>
             <option value="beans">第2章: 品種・テロワール・栽培</option>
@@ -288,7 +289,7 @@
             <option value="sensory">第5章: 官能・受容体・カッピング</option>
             <option value="history">第6章: 歴史・文化・哲学</option>
           </select>
-          <select id="archive-status-select" onchange="filterArchive()" class="text-xs sm:text-sm px-3 py-2 rounded-lg border border-roast-200 bg-white text-roast-800 focus:outline-none">
+          <select id="archive-status-select" onchange="filterArchive()" class="text-sm px-3 py-2 rounded-lg border border-roast-200 bg-white text-roast-800 focus:outline-none">
             <option value="all">すべてのステータス</option>
             <option value="unread">未読のみ (読み逃し分)</option>
             <option value="read">読了済み</option>
@@ -298,7 +299,7 @@
       </div>
 
       <!-- Archive Cards Grid -->
-      <div id="archive-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      <div id="archive-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <!-- Rendered by JS -->
       </div>
     </section>
@@ -325,7 +326,7 @@
 
         <!-- Quick Question Pills -->
         <div class="mt-4 pt-3.5 border-t border-roast-100">
-          <span class="text-xs font-semibold text-roast-500 block mb-2">おすすめの最新トピック質問：</span>
+          <span class="text-xs sm:text-sm font-semibold text-roast-500 block mb-2">おすすめの最新トピック質問：</span>
           <div class="flex flex-wrap gap-2">
             <button onclick="setAiQuery('「抽出率（EY: 18〜22%）」と「収率」の黄金律について、科学的背景や具体的な抽出での実践方法をさらに深掘りして教えてください。')" class="text-xs sm:text-sm px-3 py-1.5 rounded-full bg-roast-100 hover:bg-roast-200 text-roast-800 transition">
               ☕ 抽出率（EY）と収率の深掘り
@@ -347,10 +348,10 @@
 
         <!-- Query Input Form -->
         <div class="mt-4 space-y-3 w-full">
-          <textarea id="ai-query-input" rows="3" placeholder="質問したいコーヒーの疑問を入力してください（例: 最新のWBCで話題の抽出理論について...）" class="w-full text-xs sm:text-sm p-3 rounded-xl border border-roast-200 focus:outline-none focus:ring-1 focus:ring-roast-600 bg-white resize-none box-border leading-relaxed"></textarea>
+          <textarea id="ai-query-input" rows="3" placeholder="質問したいコーヒーの疑問を入力してください（例: 最新のWBCで話題の抽出理論について...）" class="w-full text-sm sm:text-base p-3 rounded-xl border border-roast-200 focus:outline-none focus:ring-1 focus:ring-roast-600 bg-white resize-none box-border leading-relaxed"></textarea>
 
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 w-full">
-            <span class="text-xs text-roast-500">※ Google Search グランディングでWeb上の最新文献を元に回答します</span>
+            <span class="text-xs sm:text-sm text-roast-500">※ Google Search グランディングでWeb上の最新文献を元に回答します</span>
             <button id="ai-submit-btn" onclick="askAiBarista()" class="w-full sm:w-auto px-6 py-2.5 bg-roast-800 hover:bg-roast-900 active:bg-black text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-2 shrink-0">
               <span>Web検索して質問する</span>
               <i class="fa-solid fa-paper-plane text-xs"></i>
@@ -364,14 +365,14 @@
         <div class="flex items-center justify-between border-b border-roast-100 pb-3 mb-3 gap-2">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs sm:text-sm font-bold text-roast-800">バリスタからの回答 &amp; Web文献ソース</span>
+            <span class="text-sm sm:text-base font-bold text-roast-800">バリスタからの回答 &amp; Web文献ソース</span>
           </div>
-          <button onclick="copyAiResponse()" class="text-xs text-roast-600 hover:text-roast-900 flex items-center gap-1.5 font-medium">
+          <button onclick="copyAiResponse()" class="text-xs sm:text-sm text-roast-600 hover:text-roast-900 flex items-center gap-1.5 font-medium">
             <i class="fa-regular fa-copy"></i> コピー
           </button>
         </div>
-        <div id="ai-response-content" class="text-xs sm:text-sm leading-relaxed text-roast-900 space-y-3 break-words-anywhere w-full"></div>
-        <div id="ai-sources-container" class="mt-4 pt-3 border-t border-roast-100 text-xs text-roast-600 hidden w-full break-words-anywhere">
+        <div id="ai-response-content" class="text-sm sm:text-base leading-relaxed text-roast-900 space-y-3 break-words-anywhere w-full"></div>
+        <div id="ai-sources-container" class="mt-4 pt-3 border-t border-roast-100 text-xs sm:text-sm text-roast-600 hidden w-full break-words-anywhere">
           <strong class="text-roast-900 block mb-1.5">Google検索が参照した最新ソース / 出典リンク:</strong>
           <ul id="ai-sources-list" class="list-disc pl-5 space-y-1.5 w-full break-words-anywhere"></ul>
         </div>
@@ -384,23 +385,23 @@
         <!-- Font Size Options -->
         <div>
           <h3 class="text-base sm:text-lg font-bold font-serif-jp text-roast-900 mb-1">文字の大きさ（フォントサイズ）</h3>
-          <p class="text-xs sm:text-sm text-roast-600 leading-relaxed mb-3">お好みの文字サイズを選択してください。タブバーの形を崩さず、記事本文や解説文が読みやすい大きさに調整されます。</p>
+          <p class="text-xs sm:text-sm text-roast-600 leading-relaxed mb-3">お好みの文字サイズを選択してください。タブバーの形を崩さず、記事本文や解説文がゆったり読みやすい大きさに調整されます。</p>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <button onclick="setFontSize('sm', true)" id="setting-fs-sm" class="py-2.5 px-3 rounded-xl border text-center transition flex flex-col items-center justify-center gap-1">
-              <span class="text-xs font-bold">小</span>
-              <span class="text-[11px] text-roast-500">85%</span>
+              <span class="text-sm font-bold">小</span>
+              <span class="text-xs text-roast-500">16px</span>
             </button>
             <button onclick="setFontSize('md', true)" id="setting-fs-md" class="py-2.5 px-3 rounded-xl border text-center transition flex flex-col items-center justify-center gap-1">
-              <span class="text-sm font-bold">標準</span>
-              <span class="text-[11px] text-roast-500">100% (通常)</span>
+              <span class="text-base font-bold">標準・大</span>
+              <span class="text-xs text-roast-500">18px (見やすい)</span>
             </button>
             <button onclick="setFontSize('lg', true)" id="setting-fs-lg" class="py-2.5 px-3 rounded-xl border text-center transition flex flex-col items-center justify-center gap-1">
-              <span class="text-base font-bold">大</span>
-              <span class="text-[11px] text-roast-500">115% (おすすめ)</span>
+              <span class="text-lg font-bold">特大</span>
+              <span class="text-xs text-roast-500">20px</span>
             </button>
             <button onclick="setFontSize('xl', true)" id="setting-fs-xl" class="py-2.5 px-3 rounded-xl border text-center transition flex flex-col items-center justify-center gap-1">
-              <span class="text-lg font-bold">特大</span>
-              <span class="text-[11px] text-roast-500">130%</span>
+              <span class="text-xl font-bold">極大</span>
+              <span class="text-xs text-roast-500">22px</span>
             </button>
           </div>
         </div>
@@ -461,41 +462,41 @@
 
   <!-- Detail Modal -->
   <div id="detail-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto border border-roast-300 shadow-2xl">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-7 space-y-4 max-h-[90vh] overflow-y-auto border border-roast-300 shadow-2xl">
       <div class="flex items-start justify-between gap-2 border-b border-roast-100 pb-2.5">
         <div class="flex items-center gap-2">
-          <span id="modal-category" class="text-xs font-bold px-2.5 py-0.5 rounded bg-roast-100 text-roast-800 uppercase">抽出・科学</span>
-          <span id="modal-web-tag" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">
-            <i class="fa-solid fa-globe text-[9px]"></i> Web最新
+          <span id="modal-category" class="text-xs sm:text-sm font-bold px-2.5 py-1 rounded bg-roast-100 text-roast-800 uppercase">抽出・科学</span>
+          <span id="modal-web-tag" class="hidden text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">
+            <i class="fa-solid fa-globe text-xs"></i> Web最新
           </span>
         </div>
-        <button onclick="closeDetailModal()" class="p-1 text-roast-500 hover:text-roast-900 text-lg">
+        <button onclick="closeDetailModal()" class="p-1 text-roast-500 hover:text-roast-900 text-xl">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <h3 id="modal-title" class="text-base sm:text-lg font-bold font-serif-jp text-roast-900 leading-snug break-words-anywhere">タイトル</h3>
-      <p id="modal-detail" class="text-xs sm:text-sm text-roast-700 leading-relaxed break-words-anywhere">詳細テキスト</p>
+      <h3 id="modal-title" class="text-lg sm:text-xl font-bold font-serif-jp text-roast-900 leading-snug break-words-anywhere">タイトル</h3>
+      <p id="modal-detail" class="text-sm sm:text-base text-roast-700 leading-relaxed break-words-anywhere">詳細テキスト</p>
 
-      <div class="bg-amber-50/80 border border-amber-200/90 rounded-xl p-3 text-xs sm:text-sm text-amber-950">
-        <div class="font-bold flex items-center gap-1.5 mb-1 text-amber-900">
+      <div class="bg-amber-50/80 border border-amber-200/90 rounded-xl p-3.5 text-xs sm:text-sm text-amber-950">
+        <div class="font-bold flex items-center gap-1.5 mb-1 text-amber-900 text-sm">
           <i class="fa-solid fa-lightbulb text-amber-600"></i>
           <span>淹れ方に活かす実践ヒント</span>
         </div>
-        <p id="modal-practical-tip" class="leading-relaxed break-words-anywhere"></p>
+        <p id="modal-practical-tip" class="leading-relaxed break-words-anywhere text-xs sm:text-sm"></p>
       </div>
 
-      <div class="bg-roast-50 rounded-xl p-3 text-xs text-roast-600 border border-roast-200">
+      <div class="bg-roast-50 rounded-xl p-3.5 text-xs sm:text-sm text-roast-600 border border-roast-200">
         <strong class="text-roast-900 block mb-1">明記された出典・Web参照元:</strong>
-        <div id="modal-source" class="leading-relaxed break-words-anywhere font-mono text-[11px]"></div>
+        <div id="modal-source" class="leading-relaxed break-words-anywhere font-mono text-xs"></div>
       </div>
 
       <div class="pt-2 flex items-center justify-between gap-2.5 border-t border-roast-100">
-        <button id="modal-toggle-read-btn" onclick="toggleReadFromModal()" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-roast-100 text-roast-800 hover:bg-roast-200">
+        <button id="modal-toggle-read-btn" onclick="toggleReadFromModal()" class="flex-1 py-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-roast-100 text-roast-800 hover:bg-roast-200">
           <i class="fa-regular fa-circle-check"></i>
           <span>読了にする</span>
         </button>
-        <button onclick="askAiFromModal()" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-roast-800 hover:bg-roast-900 text-white transition flex items-center justify-center gap-1.5">
+        <button onclick="askAiFromModal()" class="flex-1 py-3 rounded-xl text-xs sm:text-sm font-bold bg-roast-800 hover:bg-roast-900 text-white transition flex items-center justify-center gap-1.5">
           <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
           <span>AIに深掘り質問</span>
         </button>
@@ -507,7 +508,7 @@
   <div id="ios-guide-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 border border-roast-300 shadow-2xl">
       <div class="flex items-center justify-between border-b border-roast-100 pb-2.5">
-        <h3 class="text-base font-bold font-serif-jp text-roast-900">Safariでホーム画面に追加する手順</h3>
+        <h3 class="text-base sm:text-lg font-bold font-serif-jp text-roast-900">Safariでホーム画面に追加する手順</h3>
         <button onclick="closeIosGuideModal()" class="p-1 text-roast-500 hover:text-roast-900 text-lg">
           <i class="fa-solid fa-xmark"></i>
         </button>
@@ -571,19 +572,19 @@
       readIds: new Set(),
       bookmarkedIds: new Set(),
       notificationTime: '08:00',
-      fontSize: 'md',
+      fontSize: 'md', // デフォルト: 18px (標準・大)
       apiKey: '',
-      webCache: {} // 日付ごとのGemini収集結果キャッシュ
+      webCache: {}
     };
 
     // =========================================================================
-    // FONT SIZE SCALING LOGIC (無音適用 & 手動時通知)
+    // FONT SIZE SCALING LOGIC (基本サイズを18pxに底上げ)
     // =========================================================================
     const FONT_SCALES = {
-      sm: { root: '14px', label: '小 (85%)' },
-      md: { root: '16px', label: '標準 (100%)' },
-      lg: { root: '18px', label: '大 (115%)' },
-      xl: { root: '20px', label: '特大 (130%)' }
+      sm: { root: '16px', label: '小 (16px)' },
+      md: { root: '18px', label: '標準・大 (18px)' },
+      lg: { root: '20px', label: '特大 (20px)' },
+      xl: { root: '22px', label: '極大 (22px)' }
     };
 
     function setFontSize(sizeKey, showToast = false) {
@@ -615,7 +616,6 @@
       const dropdown = document.getElementById('font-size-dropdown');
       if (dropdown) dropdown.classList.add('hidden');
 
-      // 手動で変更された時のみトーストを表示（起動時は非表示）
       if (showToast) {
         showToastNotification(`文字サイズを「${FONT_SCALES[sizeKey].label}」に設定しました`);
       }
@@ -636,7 +636,7 @@
     });
 
     // =========================================================================
-    // BASE KNOWLEDGE REPOSITORY (90選・Webオフライン時や初期表示に活用)
+    // BASE KNOWLEDGE REPOSITORY
     // =========================================================================
     const GROUP_EXTRACTION = [
       {
@@ -757,15 +757,13 @@
       }
     ];
 
-    // 全てのベース知識リスト
     const ALL_BASE_KNOWLEDGE = [...GROUP_EXTRACTION, ...GROUP_BEANS, ...GROUP_PROCESS];
 
     // =========================================================================
-    // GEMINI 3 FLASH + GOOGLE SEARCH GROUNDING REVOLUTION
-    // 毎日ネットから最新のコーヒー科学・研究・ニュースを収集して本日の3知識を構築
+    // GEMINI 3 FLASH + GOOGLE SEARCH GROUNDING
     // =========================================================================
     async function fetchDailyKnowledgeFromWeb(dateString) {
-      const apiKey = STATE.apiKey || ""; // Canvas環境では空文字で自動供給される
+      const apiKey = STATE.apiKey || "";
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
       const systemPrompt = `
@@ -777,7 +775,7 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
   {
     "id": "web_${Date.now()}_1",
     "title": "タイトル（魅力的で具体的な学術・技術名）",
-    "category": "extraction", // extraction | beans | processing | roast | sensory | history
+    "category": "extraction",
     "categoryName": "第1章: 抽出・最新科学",
     "summary": "要約（100文字前後）",
     "detail": "科学的背景・実験結果・専門書や最新論文に基づく詳細解説（200〜300文字）",
@@ -827,9 +825,7 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
           body: JSON.stringify(payload)
         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const result = await response.json();
         const candidate = result.candidates?.[0];
@@ -839,7 +835,6 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
 
         const text = candidate.content.parts[0].text;
         
-        // グラウンディングソース（参照URLとタイトル）の抽出
         let webSources = [];
         const groundingMetadata = candidate.groundingMetadata;
         if (groundingMetadata && groundingMetadata.groundingAttributions) {
@@ -851,7 +846,6 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
             .filter(s => s.uri);
         }
 
-        // JSONパース
         let cleaned = text.trim();
         if (cleaned.startsWith("```json")) {
           cleaned = cleaned.replace(/^```json\s*/, '').replace(/```\s*$/, '');
@@ -861,7 +855,6 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
 
         const parsed = JSON.parse(cleaned);
         if (Array.isArray(parsed) && parsed.length >= 3) {
-          // 各カードにWebグラウンディングソースを付与
           return parsed.slice(0, 3).map((item, idx) => {
             const associatedSource = webSources[idx] || webSources[0];
             return {
@@ -905,7 +898,6 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
       return `${y}-${m}-${d}`;
     }
 
-    // オフライン・フォールバック用：重複しない計算ロジック
     function getFallbackKnowledgeForDate(date) {
       const epoch = new Date(2025, 0, 1).getTime();
       const dayIndex = Math.floor((date.getTime() - epoch) / (1000 * 60 * 60 * 24));
@@ -926,7 +918,6 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
       const dateString = formatDateString(targetDate);
       const dateKey = getDateKey(targetDate);
 
-      // UIの日付表記を更新
       const dateDisplay = document.getElementById('current-display-date');
       const dateBadge = document.getElementById('date-badge-status');
       const dateOffset = document.getElementById('date-day-offset-text');
@@ -940,62 +931,57 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
       if (currentDayOffset === 0) {
         if (dateBadge) {
           dateBadge.textContent = '本日';
-          dateBadge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300';
+          dateBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300';
         }
         if (dateOffset) dateOffset.textContent = '';
         if (prevLabel) prevLabel.textContent = '前の日';
         if (todayBtn) {
-          todayBtn.className = 'flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-roast-800 text-white shadow-xs';
+          todayBtn.className = 'flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-roast-800 text-white shadow-xs';
         }
       } else {
         const daysAgo = Math.abs(currentDayOffset);
         if (dateBadge) {
           dateBadge.textContent = `${daysAgo}日前`;
-          dateBadge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-roast-200 text-roast-900 border border-roast-300';
+          dateBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-roast-200 text-roast-900 border border-roast-300';
         }
         if (dateOffset) dateOffset.textContent = `(${daysAgo}日前の知識)`;
         if (prevLabel) prevLabel.textContent = 'さらに前の日';
         if (todayBtn) {
-          todayBtn.className = 'flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 bg-white text-roast-800 border border-roast-300 hover:bg-roast-50';
+          todayBtn.className = 'flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 bg-white text-roast-800 border border-roast-300 hover:bg-roast-50';
         }
       }
 
-      // キャッシュ確認 または Gemini Google Search による最新情報収集
       let dailyItems = STATE.webCache[dateKey];
       
       if (!dailyItems) {
-        // ロード中表示
         if (webSyncBadge) {
-          webSyncBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1 pulse-dot';
+          webSyncBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1 pulse-dot';
           webSyncText.textContent = 'Gemini Web検索中...';
         }
 
-        // Web検索を実行
         dailyItems = await fetchDailyKnowledgeFromWeb(dateString);
 
         if (dailyItems) {
           STATE.webCache[dateKey] = dailyItems;
           localStorage.setItem('coffee_web_cache', JSON.stringify(STATE.webCache));
           if (webSyncBadge) {
-            webSyncBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1';
+            webSyncBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1';
             webSyncText.textContent = 'Gemini Web収集済み';
           }
         } else {
-          // フォールバック
           dailyItems = getFallbackKnowledgeForDate(targetDate);
           if (webSyncBadge) {
-            webSyncBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-roast-100 text-roast-700 border border-roast-200 flex items-center gap-1';
+            webSyncBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-roast-100 text-roast-700 border border-roast-200 flex items-center gap-1';
             webSyncText.textContent = '内蔵ナレッジ表示';
           }
         }
       } else {
         if (webSyncBadge) {
-          webSyncBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1';
+          webSyncBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1';
           webSyncText.textContent = 'Gemini Web収集済み (保存済)';
         }
       }
 
-      // レンダリング
       renderDailyCards(dailyItems);
       updateProgress();
     }
@@ -1011,51 +997,53 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
         return `
           <div class="card-surface rounded-2xl p-4 sm:p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md ${isRead ? 'border-emerald-300 bg-white/95' : 'border-roast-200'}">
             <div>
-              <div class="flex items-start justify-between gap-2 mb-2.5">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md bg-roast-100 text-roast-800 uppercase tracking-wider">
+              <div class="flex items-start justify-between gap-2 mb-3">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-roast-100 text-roast-800 uppercase tracking-wider">
                     ${item.categoryName}
                   </span>
                   ${item.isWebSourced ? `
-                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1">
-                      <i class="fa-solid fa-globe text-[8px]"></i> Web最新
+                    <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1">
+                      <i class="fa-solid fa-globe text-xs"></i> Web最新
                     </span>
                   ` : ''}
                 </div>
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1.5">
                   <button onclick="toggleBookmark('${item.id}', event)" title="お気に入り" class="p-1.5 rounded-lg text-roast-400 hover:text-amber-500 transition ${isBookmarked ? 'text-amber-500 font-bold' : ''}">
-                    <i class="${isBookmarked ? 'fa-solid' : 'fa-regular'} fa-bookmark text-sm"></i>
+                    <i class="${isBookmarked ? 'fa-solid' : 'fa-regular'} fa-bookmark text-base"></i>
                   </button>
-                  <span class="text-[11px] font-semibold text-roast-400 font-mono">#0${index + 1}</span>
+                  <span class="text-xs font-semibold text-roast-400 font-mono">#0${index + 1}</span>
                 </div>
               </div>
 
-              <h3 class="text-sm sm:text-base font-bold text-roast-900 font-serif-jp tracking-tight leading-snug mb-2 cursor-pointer hover:text-amber-800 transition break-words-anywhere" onclick="openDetailModalById('${item.id}')">
+              <!-- カードタイトル：大きめの見やすいフォント -->
+              <h3 class="text-base sm:text-lg font-bold text-roast-900 font-serif-jp tracking-tight leading-snug mb-2.5 cursor-pointer hover:text-amber-800 transition break-words-anywhere" onclick="openDetailModalById('${item.id}')">
                 ${item.title}
               </h3>
 
-              <p class="text-xs sm:text-sm text-roast-600 leading-relaxed line-clamp-3 mb-3 break-words-anywhere">
+              <!-- 要約文：しっかり読めるフォントサイズ -->
+              <p class="text-sm sm:text-base text-roast-700 leading-relaxed line-clamp-3 mb-3.5 break-words-anywhere">
                 ${item.summary}
               </p>
 
               <!-- 実践ヒント抜粋 -->
-              <div class="bg-amber-50/70 border border-amber-200/80 rounded-xl p-2.5 text-xs text-amber-950 mb-3">
-                <span class="font-bold flex items-center gap-1 text-[11px] text-amber-900 mb-0.5">
-                  <i class="fa-solid fa-lightbulb text-amber-600 text-[10px]"></i> 実践ヒント:
+              <div class="bg-amber-50/70 border border-amber-200/80 rounded-xl p-3 text-xs sm:text-sm text-amber-950 mb-3.5">
+                <span class="font-bold flex items-center gap-1 text-xs sm:text-sm text-amber-900 mb-1">
+                  <i class="fa-solid fa-lightbulb text-amber-600 text-xs"></i> 実践ヒント:
                 </span>
-                <p class="line-clamp-2 leading-relaxed text-[11px]">${item.practicalTip}</p>
+                <p class="line-clamp-2 leading-relaxed text-xs sm:text-sm">${item.practicalTip}</p>
               </div>
             </div>
 
             <!-- フッターアクション -->
-            <div class="pt-2 border-t border-roast-100 flex items-center justify-between gap-2 mt-auto">
-              <button onclick="openDetailModalById('${item.id}')" class="text-xs font-bold text-roast-700 hover:text-roast-950 flex items-center gap-1 transition">
+            <div class="pt-2.5 border-t border-roast-100 flex items-center justify-between gap-2 mt-auto">
+              <button onclick="openDetailModalById('${item.id}')" class="text-xs sm:text-sm font-bold text-roast-700 hover:text-roast-950 flex items-center gap-1 transition">
                 <span>詳細・論文</span>
-                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
               </button>
 
-              <button onclick="toggleReadStatus('${item.id}', event)" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${isRead ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-roast-100 text-roast-800 hover:bg-roast-200'}">
-                <i class="${isRead ? 'fa-solid fa-check text-emerald-600' : 'fa-regular fa-circle'} text-[11px]"></i>
+              <button onclick="toggleReadStatus('${item.id}', event)" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 ${isRead ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-roast-100 text-roast-800 hover:bg-roast-200'}">
+                <i class="${isRead ? 'fa-solid fa-check text-emerald-600' : 'fa-regular fa-circle'} text-xs"></i>
                 <span>${isRead ? '読了済' : '読了にする'}</span>
               </button>
             </div>
@@ -1101,12 +1089,10 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
     // MODAL DIALOG CONTROLLER
     // =========================================================================
     function findItemById(id) {
-      // キャッシュ内を検索
       for (const k in STATE.webCache) {
         const found = STATE.webCache[k].find(item => item.id === id);
         if (found) return found;
       }
-      // ベースリポジトリ内を検索
       return ALL_BASE_KNOWLEDGE.find(item => item.id === id);
     }
 
@@ -1122,7 +1108,6 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
       const tipEl = document.getElementById('modal-practical-tip');
       const sourceEl = document.getElementById('modal-source');
       const webTag = document.getElementById('modal-web-tag');
-      const readBtn = document.getElementById('modal-toggle-read-btn');
 
       if (catEl) catEl.textContent = item.categoryName;
       if (titleEl) titleEl.textContent = item.title;
@@ -1131,7 +1116,7 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
       
       if (sourceEl) {
         if (item.sourceUrl) {
-          sourceEl.innerHTML = `${item.sources} <br><a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer" class="text-amber-700 underline font-semibold mt-1 inline-block"><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> 参照元Webページを開く</a>`;
+          sourceEl.innerHTML = `${item.sources} <br><a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer" class="text-amber-800 underline font-semibold mt-1.5 inline-block"><i class="fa-solid fa-arrow-up-right-from-square text-xs"></i> 参照元Webページを開く</a>`;
         } else {
           sourceEl.textContent = item.sources;
         }
@@ -1156,10 +1141,10 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
       const isRead = STATE.readIds.has(id);
       if (isRead) {
         readBtn.innerHTML = '<i class="fa-solid fa-check text-emerald-600"></i><span>読了済み</span>';
-        readBtn.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-emerald-100 text-emerald-900 hover:bg-emerald-200';
+        readBtn.className = 'flex-1 py-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-emerald-100 text-emerald-900 hover:bg-emerald-200';
       } else {
         readBtn.innerHTML = '<i class="fa-regular fa-circle-check"></i><span>読了にする</span>';
-        readBtn.className = 'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-roast-100 text-roast-800 hover:bg-roast-200';
+        readBtn.className = 'flex-1 py-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-roast-100 text-roast-800 hover:bg-roast-200';
       }
     }
 
@@ -1233,7 +1218,6 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
       const selectedCat = catSelect?.value || 'all';
       const selectedStatus = statusSelect?.value || 'all';
 
-      // ベース知識 ＋ Web収集キャッシュを合体
       const map = new Map();
       ALL_BASE_KNOWLEDGE.forEach(k => map.set(k.id, k));
       for (const dateKey in STATE.webCache) {
@@ -1261,7 +1245,7 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
         container.innerHTML = `
           <div class="col-span-full py-12 text-center text-roast-400">
             <i class="fa-solid fa-mug-empty text-3xl mb-2"></i>
-            <p class="text-xs sm:text-sm">条件に一致する知識が見つかりませんでした。</p>
+            <p class="text-sm">条件に一致する知識が見つかりませんでした。</p>
           </div>
         `;
         return;
@@ -1272,22 +1256,22 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
         const isBookmarked = STATE.bookmarkedIds.has(item.id);
 
         return `
-          <div class="card-surface rounded-xl p-3.5 sm:p-4 flex flex-col justify-between hover:shadow-md transition ${isRead ? 'border-emerald-300' : 'border-roast-200'}">
+          <div class="card-surface rounded-xl p-4 flex flex-col justify-between hover:shadow-md transition ${isRead ? 'border-emerald-300' : 'border-roast-200'}">
             <div>
-              <div class="flex items-center justify-between gap-1 mb-2">
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-roast-100 text-roast-700">${item.categoryName}</span>
+              <div class="flex items-center justify-between gap-1 mb-2.5">
+                <span class="text-xs font-bold px-2.5 py-0.5 rounded bg-roast-100 text-roast-700">${item.categoryName}</span>
                 <button onclick="toggleBookmark('${item.id}', event)" class="p-1 text-roast-400 hover:text-amber-500 ${isBookmarked ? 'text-amber-500' : ''}">
-                  <i class="${isBookmarked ? 'fa-solid' : 'fa-regular'} fa-bookmark text-xs"></i>
+                  <i class="${isBookmarked ? 'fa-solid' : 'fa-regular'} fa-bookmark text-sm"></i>
                 </button>
               </div>
-              <h4 class="text-xs sm:text-sm font-bold font-serif-jp text-roast-900 mb-1.5 cursor-pointer hover:text-amber-800 transition break-words-anywhere" onclick="openDetailModalById('${item.id}')">
+              <h4 class="text-sm sm:text-base font-bold font-serif-jp text-roast-900 mb-2 cursor-pointer hover:text-amber-800 transition break-words-anywhere" onclick="openDetailModalById('${item.id}')">
                 ${item.title}
               </h4>
-              <p class="text-[11px] sm:text-xs text-roast-600 line-clamp-2 leading-relaxed mb-3 break-words-anywhere">${item.summary}</p>
+              <p class="text-xs sm:text-sm text-roast-600 line-clamp-2 leading-relaxed mb-3 break-words-anywhere">${item.summary}</p>
             </div>
-            <div class="flex items-center justify-between pt-2 border-t border-roast-100 mt-auto">
-              <button onclick="openDetailModalById('${item.id}')" class="text-[11px] font-bold text-roast-700 hover:underline">詳細を見る</button>
-              <button onclick="toggleReadStatus('${item.id}', event)" class="px-2.5 py-1 rounded text-[11px] font-bold transition ${isRead ? 'bg-emerald-100 text-emerald-800' : 'bg-roast-100 text-roast-800 hover:bg-roast-200'}">
+            <div class="flex items-center justify-between pt-2.5 border-t border-roast-100 mt-auto">
+              <button onclick="openDetailModalById('${item.id}')" class="text-xs sm:text-sm font-bold text-roast-700 hover:underline">詳細を見る</button>
+              <button onclick="toggleReadStatus('${item.id}', event)" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition ${isRead ? 'bg-emerald-100 text-emerald-800' : 'bg-roast-100 text-roast-800 hover:bg-roast-200'}">
                 ${isRead ? '✓ 読了' : '読了にする'}
               </button>
             </div>
@@ -1297,7 +1281,7 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
     }
 
     // =========================================================================
-    // AI BARISTA & COFFEE SCIENTIST (WITH GOOGLE SEARCH GROUNDING)
+    // AI BARISTA & COFFEE SCIENTIST
     // =========================================================================
     function setAiQuery(text) {
       const input = document.getElementById('ai-query-input');
@@ -1331,7 +1315,7 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
         responseContent.innerHTML = `
           <div class="py-4 text-center text-roast-600 space-y-2">
             <i class="fa-solid fa-circle-notch fa-spin text-amber-600 text-xl"></i>
-            <p class="text-xs">Google Searchで最新文献・SCA規格を検索中...</p>
+            <p class="text-sm">Google Searchで最新文献・SCA規格を検索中...</p>
           </div>
         `;
       }
@@ -1369,7 +1353,6 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
         const rawText = candidate.content.parts[0].text;
         renderAiMarkdown(rawText);
 
-        // グラウンディングソースの表示
         let sources = [];
         const metadata = candidate.groundingMetadata;
         if (metadata && metadata.groundingAttributions) {
@@ -1386,7 +1369,7 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
             <li>
               <a href="${s.uri}" target="_blank" rel="noopener noreferrer" class="text-amber-800 hover:underline inline-flex items-center gap-1 font-medium">
                 <span>${s.title}</span>
-                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
               </a>
             </li>
           `).join('');
@@ -1395,7 +1378,6 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
 
       } catch (err) {
         console.warn("Gemini Live Call failed, using intelligent offline barista fallback:", err);
-        // オフライン・フォールバック回答エンジン
         const fallbackAnswer = generateIntelligentFallback(query);
         renderAiMarkdown(fallbackAnswer.text);
 
@@ -1418,12 +1400,12 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
       if (!responseContent) return;
 
       const formatted = rawText
-        .replace(/### (.*?)\n/g, '<h4 class="text-sm font-bold text-roast-900 mt-2 mb-1">$1</h4>')
+        .replace(/### (.*?)\n/g, '<h4 class="text-base font-bold text-roast-900 mt-3 mb-1.5">$1</h4>')
         .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-roast-950">$1</strong>')
-        .replace(/^\* (.*?)$/gm, '<li class="ml-4 list-disc text-roast-800">$1</li>')
-        .replace(/\n\n/g, '</p><p class="mt-2">');
+        .replace(/^\* (.*?)$/gm, '<li class="ml-4 list-disc text-roast-800 text-sm sm:text-base mb-1">$1</li>')
+        .replace(/\n\n/g, '</p><p class="mt-2 text-sm sm:text-base">');
 
-      responseContent.innerHTML = `<p>${formatted}</p>`;
+      responseContent.innerHTML = `<p class="text-sm sm:text-base">${formatted}</p>`;
     }
 
     function generateIntelligentFallback(query) {
@@ -1495,7 +1477,7 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
         const webCache = localStorage.getItem('coffee_web_cache');
         if (webCache) STATE.webCache = JSON.parse(webCache);
 
-        // フォントサイズを静かにロード（トースト通知は出さない）
+        // デフォルトを18px ('md') に設定
         const savedFontSize = localStorage.getItem('coffee_font_size') || 'md';
         setFontSize(savedFontSize, false);
 
@@ -1552,7 +1534,7 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
       if (!container) return;
 
       const toast = document.createElement('div');
-      toast.className = 'bg-roast-900 text-white text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-lg border border-roast-700 flex items-center justify-between gap-2 pointer-events-auto transition-all duration-300 opacity-0 transform -translate-y-2';
+      toast.className = 'bg-roast-900 text-white text-sm px-4 py-3 rounded-xl shadow-lg border border-roast-700 flex items-center justify-between gap-2 pointer-events-auto transition-all duration-300 opacity-0 transform -translate-y-2';
       toast.innerHTML = `<span>${msg}</span><i class="fa-solid fa-xmark cursor-pointer text-roast-400 hover:text-white" onclick="this.parentElement.remove()"></i>`;
 
       container.appendChild(toast);
@@ -1613,8 +1595,8 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
     function closeResetModal() {
       const modal = document.getElementById('reset-confirm-modal');
       if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
       }
     }
 
@@ -1673,7 +1655,6 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
       updateDailyView();
       filterArchive();
 
-      // 通知の時刻監視タイマー (毎分チェック)
       setInterval(() => {
         const now = new Date();
         const currentHM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
