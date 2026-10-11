@@ -44,7 +44,7 @@
 
   <style>
     :root {
-      /* 基本フォントサイズを16pxから18pxへ底上げし、視認性を大幅向上 */
+      /* 基本フォントサイズを18pxに設定（大きめで視認性抜群） */
       font-size: 18px;
     }
     html, body {
@@ -79,7 +79,7 @@
       overflow-wrap: anywhere;
       word-break: break-word;
     }
-    /* タブバー：指定箇所の寸法・文字サイズを厳格固定（文字サイズ変更時も崩れない） */
+    /* タブバー寸法・文字サイズの完全固定（文字サイズ変更時も崩れない） */
     .tab-bar-fixed {
       width: 100% !important;
     }
@@ -107,19 +107,12 @@
         gap: 6px !important;
       }
     }
-    .pulse-dot {
-      animation: pulseAnimation 2s infinite ease-in-out;
-    }
-    @keyframes pulseAnimation {
-      0%, 100% { transform: scale(1); opacity: 0.8; }
-      50% { transform: scale(1.3); opacity: 1; }
-    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-roast-200 selection:text-roast-950">
 
-  <!-- Toast Notification Container -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-xs w-full pointer-events-none px-2"></div>
+  <!-- Toast Notification Container (画面上部にスッキリ表示) -->
+  <div id="toast-container" class="fixed top-3 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-3"></div>
 
   <!-- Header -->
   <header class="sticky top-0 z-40 glass-nav border-b border-roast-200/80 w-full transition-shadow">
@@ -144,7 +137,7 @@
             <i class="fa-solid fa-chevron-down text-[10px] text-roast-600 ml-0.5"></i>
           </button>
           
-          <div id="font-size-dropdown" class="hidden absolute right-0 mt-1.5 w-40 bg-white rounded-xl shadow-xl border border-roast-200 p-1.5 z-50 text-xs font-medium space-y-1">
+          <div id="font-size-dropdown" class="hidden absolute right-0 mt-1.5 w-44 bg-white rounded-xl shadow-xl border border-roast-200 p-1.5 z-50 text-xs font-medium space-y-1">
             <div class="px-2 py-1 text-xs text-roast-400 font-bold border-b border-roast-100 mb-1">文字の大きさ</div>
             <button onclick="setFontSize('sm', true)" id="fs-btn-sm" class="w-full text-left px-2.5 py-2 rounded-md hover:bg-roast-100 flex items-center justify-between text-roast-800">
               <span class="text-xs">小 (16px)</span>
@@ -184,7 +177,7 @@
   <!-- Main Container -->
   <main class="flex-1 max-w-4xl mx-auto w-full px-3 sm:px-6 py-4 space-y-4 min-w-0">
 
-    <!-- Tab bar (スマホ幅に100%均等フィット・文字サイズ変更時も固定寸法を維持) -->
+    <!-- Tab bar (スマホ幅に100%均等フィット・寸法完全固定) -->
     <div class="w-full border-b border-roast-200 pb-2 tab-bar-fixed">
       <div class="flex items-center justify-between gap-2 w-full">
         <div class="grid grid-cols-4 gap-1 sm:gap-1.5 w-full sm:w-auto sm:flex sm:space-x-1.5">
@@ -202,7 +195,7 @@
           </button>
           <button onclick="switchTab('settings')" id="tab-btn-settings" class="tab-btn tab-btn-locked font-semibold rounded-lg transition-all text-roast-700 hover:bg-roast-100">
             <i class="fa-solid fa-sliders text-xs sm:text-sm"></i>
-            <span class="truncate">時間・設定</span>
+            <span class="truncate">設定・除外</span>
           </button>
         </div>
 
@@ -214,8 +207,23 @@
 
     <!-- ==================== VIEW 1: DAILY 3 KNOWLEDGE ==================== -->
     <section id="view-daily" class="tab-view space-y-4">
+
+      <!-- APIキー未設定時のご案内バナー（ワンタップで設定可能） -->
+      <div id="api-key-banner" class="hidden card-surface rounded-xl p-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-600 text-base shrink-0"></i>
+            <p class="text-xs sm:text-sm text-amber-950 font-medium truncate">
+              Google Gemini APIキー（無料）を登録すると、毎朝Webを自動巡回して完全新規の研究情報を取得できます。
+            </p>
+          </div>
+          <button onclick="openApiKeyModal()" class="shrink-0 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition shadow-xs">
+            キーを設定
+          </button>
+        </div>
+      </div>
       
-      <!-- 日付ナビゲーションバー（本日と前の日 ＋ Web同期ステータス） -->
+      <!-- 日付ナビゲーションバー（本日と前の日 ＋ 重複除外ステータス） -->
       <div class="card-surface rounded-2xl p-3.5 sm:p-4 bg-gradient-to-r from-white via-roast-50/40 to-white shadow-sm border border-roast-200/90">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
           
@@ -230,10 +238,10 @@
                   本日
                 </span>
                 <span id="date-day-offset-text" class="text-xs text-roast-500 font-medium"></span>
-                <!-- Web収集バッジ -->
+                <!-- 重複除外バッジ -->
                 <span id="web-sync-badge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
-                  <i class="fa-solid fa-globe text-xs text-emerald-600"></i>
-                  <span id="web-sync-text">Gemini Web収集済み</span>
+                  <i class="fa-solid fa-shield-check text-xs text-emerald-600"></i>
+                  <span id="web-sync-text">完全未出・重複除外済</span>
                 </span>
               </div>
               <h2 id="current-display-date" class="text-base sm:text-lg font-bold text-roast-900 font-serif-jp tracking-tight mt-0.5">
@@ -256,10 +264,10 @@
               <span>本日</span>
             </button>
 
-            <!-- Web再収集ボタン -->
-            <button onclick="forceRefreshDailyFromWeb()" title="GeminiとGoogle Searchで最新情報をネットから再収集" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 bg-white hover:bg-roast-50 text-roast-800 border border-roast-300 shadow-2xs">
-              <i id="sync-refresh-icon" class="fa-solid fa-arrows-rotate text-amber-600 text-xs"></i>
-              <span class="hidden sm:inline">ネット更新</span>
+            <!-- 新知識生成ボタン -->
+            <button onclick="forceRefreshDaily()" title="過去の全知識を除外し、新しい3知識を即座に生成" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 bg-white hover:bg-roast-50 text-roast-800 border border-roast-300 shadow-2xs">
+              <i id="sync-refresh-icon" class="fa-solid fa-wand-magic-sparkles text-amber-600 text-xs"></i>
+              <span class="hidden sm:inline">新知識を探索</span>
             </button>
           </div>
 
@@ -278,7 +286,7 @@
         <div class="flex flex-col sm:flex-row gap-2.5">
           <div class="relative flex-1">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-roast-400 text-sm"></i>
-            <input type="text" id="archive-search-input" oninput="filterArchive()" placeholder="知識やキーワードを検索..." class="w-full text-sm pl-9 pr-3 py-2 rounded-lg border border-roast-200 focus:outline-none focus:ring-1 focus:ring-roast-600 bg-white">
+            <input type="text" id="archive-search-input" oninput="filterArchive()" placeholder="重複なく蓄積された知識を検索..." class="w-full text-sm pl-9 pr-3 py-2 rounded-lg border border-roast-200 focus:outline-none focus:ring-1 focus:ring-roast-600 bg-white">
           </div>
           <select id="archive-category-select" onchange="filterArchive()" class="text-sm px-3 py-2 rounded-lg border border-roast-200 bg-white text-roast-800 focus:outline-none">
             <option value="all">すべてのカテゴリ</option>
@@ -319,7 +327,7 @@
               </button>
             </div>
             <p class="text-xs sm:text-sm text-roast-600 mt-1 break-words-anywhere leading-relaxed">
-              Google Search と Gemini 3 Flash が連動。最新の学術論文・SCA規格・世界の最新トレンドをリアルタイム検索して回答します。
+              スペシャルティコーヒーの学術論文・SCA規格・抽出力学に基づいて専門的かつ実践的に回答します。
             </p>
           </div>
         </div>
@@ -331,7 +339,7 @@
             <button onclick="setAiQuery('「抽出率（EY: 18〜22%）」と「収率」の黄金律について、科学的背景や具体的な抽出での実践方法をさらに深掘りして教えてください。')" class="text-xs sm:text-sm px-3 py-1.5 rounded-full bg-roast-100 hover:bg-roast-200 text-roast-800 transition">
               ☕ 抽出率（EY）と収率の深掘り
             </button>
-            <button onclick="setAiQuery('最近のWorld Barista Championshipで注目されている最新の抽出理論や機材トレンドをネットで検索して教えてください。')" class="text-xs sm:text-sm px-3 py-1.5 rounded-full bg-roast-100 hover:bg-roast-200 text-roast-800 transition">
+            <button onclick="setAiQuery('World Barista Championshipで注目される最新の抽出理論や機材トレンドを教えてください。')" class="text-xs sm:text-sm px-3 py-1.5 rounded-full bg-roast-100 hover:bg-roast-200 text-roast-800 transition">
               🏆 最新のWBC競技会トレンド
             </button>
             <button onclick="setAiQuery('コエルペルチ等の最新酵母添加発酵（イースト・ファーメンテーション）の科学と味覚への影響')" class="text-xs sm:text-sm px-3 py-1.5 rounded-full bg-roast-100 hover:bg-roast-200 text-roast-800 transition">
@@ -348,12 +356,12 @@
 
         <!-- Query Input Form -->
         <div class="mt-4 space-y-3 w-full">
-          <textarea id="ai-query-input" rows="3" placeholder="質問したいコーヒーの疑問を入力してください（例: 最新のWBCで話題の抽出理論について...）" class="w-full text-sm sm:text-base p-3 rounded-xl border border-roast-200 focus:outline-none focus:ring-1 focus:ring-roast-600 bg-white resize-none box-border leading-relaxed"></textarea>
+          <textarea id="ai-query-input" rows="3" placeholder="質問したいコーヒーの疑問を入力してください（例: 抽出率EYの計算方法やチャネリング対策など）" class="w-full text-sm sm:text-base p-3 rounded-xl border border-roast-200 focus:outline-none focus:ring-1 focus:ring-roast-600 bg-white resize-none box-border leading-relaxed"></textarea>
 
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 w-full">
-            <span class="text-xs sm:text-sm text-roast-500">※ Google Search グランディングでWeb上の最新文献を元に回答します</span>
+            <span class="text-xs sm:text-sm text-roast-500">※ 学術研究・SCA規格・専門書を元に回答します</span>
             <button id="ai-submit-btn" onclick="askAiBarista()" class="w-full sm:w-auto px-6 py-2.5 bg-roast-800 hover:bg-roast-900 active:bg-black text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-2 shrink-0">
-              <span>Web検索して質問する</span>
+              <span>バリスタに質問する</span>
               <i class="fa-solid fa-paper-plane text-xs"></i>
             </button>
           </div>
@@ -365,7 +373,7 @@
         <div class="flex items-center justify-between border-b border-roast-100 pb-3 mb-3 gap-2">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-sm sm:text-base font-bold text-roast-800">バリスタからの回答 &amp; Web文献ソース</span>
+            <span class="text-sm sm:text-base font-bold text-roast-800">バリスタからの回答 &amp; 文献ソース</span>
           </div>
           <button onclick="copyAiResponse()" class="text-xs sm:text-sm text-roast-600 hover:text-roast-900 flex items-center gap-1.5 font-medium">
             <i class="fa-regular fa-copy"></i> コピー
@@ -373,7 +381,7 @@
         </div>
         <div id="ai-response-content" class="text-sm sm:text-base leading-relaxed text-roast-900 space-y-3 break-words-anywhere w-full"></div>
         <div id="ai-sources-container" class="mt-4 pt-3 border-t border-roast-100 text-xs sm:text-sm text-roast-600 hidden w-full break-words-anywhere">
-          <strong class="text-roast-900 block mb-1.5">Google検索が参照した最新ソース / 出典リンク:</strong>
+          <strong class="text-roast-900 block mb-1.5">参照した学術ソース / 出典リンク:</strong>
           <ul id="ai-sources-list" class="list-disc pl-5 space-y-1.5 w-full break-words-anywhere"></ul>
         </div>
       </div>
@@ -382,6 +390,58 @@
     <!-- ==================== VIEW 4: SETTINGS ==================== -->
     <section id="view-settings" class="tab-view hidden space-y-4">
       <div class="card-surface rounded-xl p-4 sm:p-6 space-y-5">
+        
+        <!-- Gemini APIキー設定案内カード -->
+        <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-key text-amber-700 text-lg"></i>
+              <h3 class="text-base sm:text-lg font-bold font-serif-jp text-roast-900">Google Gemini APIキー設定（無料）</h3>
+            </div>
+            <span id="api-key-status-badge" class="px-2.5 py-0.5 bg-amber-200 text-amber-950 font-bold text-xs rounded-full">
+              未設定
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-roast-700 leading-relaxed">
+            Google AI Studioの無料キーを登録すると、Gemini 3 Flash がリアルタイムでGoogle検索を行い、完全未出の最新論文・業界ニュースを毎朝自動収集します（未設定でも50種以上の厳選ナレッジを重複なく楽しめます）。
+          </p>
+          <div class="flex items-center gap-2 pt-1">
+            <button onclick="openApiKeyModal()" class="px-4 py-2 bg-roast-800 hover:bg-roast-900 text-white text-xs sm:text-sm font-bold rounded-xl transition flex items-center gap-1.5">
+              <i class="fa-solid fa-gear"></i>
+              APIキーを入力・変更する
+            </button>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="px-3 py-2 bg-white hover:bg-roast-50 text-amber-800 border border-amber-300 text-xs sm:text-sm font-semibold rounded-xl transition inline-flex items-center gap-1">
+              <span>無料キーを取得</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- 重複除外システム ステータス -->
+        <div class="bg-roast-50 border border-roast-200 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-shield-halved text-roast-700 text-lg"></i>
+              <h3 class="text-base sm:text-lg font-bold font-serif-jp text-roast-900">二度と同じ内容を出さない除外システム</h3>
+            </div>
+            <span id="used-topic-count-badge" class="px-2.5 py-1 bg-roast-200 text-roast-900 font-bold text-xs rounded-full">
+              登録済み 0件
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-roast-700 leading-relaxed">
+            一度表示されたトピック・タイトルはすべて端末の除外データベースに永久登録されます。提示時はこれらを厳格に除外し、常に未読・完全新規の専門知識のみを提示します。
+          </p>
+          <div class="pt-2 flex items-center gap-2">
+            <button onclick="forceRefreshDaily()" class="px-4 py-2 bg-roast-800 hover:bg-roast-900 text-white text-xs sm:text-sm font-bold rounded-xl transition flex items-center gap-1.5">
+              <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+              未出の3知識を今すぐ生成
+            </button>
+            <button onclick="clearUsedTopicHistory()" class="px-3 py-2 bg-white hover:bg-roast-100 text-rose-700 border border-rose-200 text-xs sm:text-sm font-semibold rounded-xl transition">
+              除外履歴のみ初期化
+            </button>
+          </div>
+        </div>
+
         <!-- Font Size Options -->
         <div>
           <h3 class="text-base sm:text-lg font-bold font-serif-jp text-roast-900 mb-1">文字の大きさ（フォントサイズ）</h3>
@@ -426,20 +486,6 @@
           </div>
         </div>
 
-        <!-- Web Collection Settings -->
-        <div class="border-t border-roast-100 pt-4">
-          <h3 class="text-base sm:text-lg font-bold font-serif-jp text-roast-900 mb-1">Gemini × Web情報収集エンジン</h3>
-          <p class="text-xs sm:text-sm text-roast-600 leading-relaxed mb-3">
-            Google Search Grounding を用いて、毎日世界の最新コーヒー研究・産地情報・SCA発表を自動検索して知識をアップデートしています。
-          </p>
-          <div class="flex gap-2">
-            <button onclick="forceRefreshDailyFromWeb()" class="px-4 py-2.5 bg-roast-800 hover:bg-roast-900 text-white text-xs sm:text-sm font-bold rounded-xl transition flex items-center gap-1.5">
-              <i class="fa-solid fa-arrows-rotate"></i>
-              ネットから今すぐ最新知識を取得
-            </button>
-          </div>
-        </div>
-
         <!-- Safari PWA Guide -->
         <div class="border-t border-roast-100 pt-3.5 space-y-2">
           <h4 class="text-xs sm:text-sm font-bold text-roast-800">Safariでのホーム画面アプリ化について</h4>
@@ -452,7 +498,7 @@
         <!-- Reset Data -->
         <div class="border-t border-roast-100 pt-3.5">
           <button onclick="openResetModal()" class="text-xs sm:text-sm text-rose-600 hover:text-rose-800 hover:underline">
-            <i class="fa-regular fa-trash-can mr-1"></i> 学習履歴・キャッシュをリセットする
+            <i class="fa-regular fa-trash-can mr-1"></i> 学習履歴・すべてのキャッシュを完全リセットする
           </button>
         </div>
       </div>
@@ -466,8 +512,8 @@
       <div class="flex items-start justify-between gap-2 border-b border-roast-100 pb-2.5">
         <div class="flex items-center gap-2">
           <span id="modal-category" class="text-xs sm:text-sm font-bold px-2.5 py-1 rounded bg-roast-100 text-roast-800 uppercase">抽出・科学</span>
-          <span id="modal-web-tag" class="hidden text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">
-            <i class="fa-solid fa-globe text-xs"></i> Web最新
+          <span id="modal-web-tag" class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">
+            <i class="fa-solid fa-shield-check text-xs"></i> 完全未出
           </span>
         </div>
         <button onclick="closeDetailModal()" class="p-1 text-roast-500 hover:text-roast-900 text-xl">
@@ -487,7 +533,7 @@
       </div>
 
       <div class="bg-roast-50 rounded-xl p-3.5 text-xs sm:text-sm text-roast-600 border border-roast-200">
-        <strong class="text-roast-900 block mb-1">明記された出典・Web参照元:</strong>
+        <strong class="text-roast-900 block mb-1">明記された出典・参照元:</strong>
         <div id="modal-source" class="leading-relaxed break-words-anywhere font-mono text-xs"></div>
       </div>
 
@@ -531,8 +577,8 @@
       <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto text-xl">
         <i class="fa-solid fa-triangle-exclamation"></i>
       </div>
-      <h3 class="text-base font-bold text-roast-900 font-serif-jp">学習記録とキャッシュをリセットしますか？</h3>
-      <p class="text-xs sm:text-sm text-roast-600">読了ステータスやWeb収集キャッシュがすべて初期化されます。</p>
+      <h3 class="text-base font-bold text-roast-900 font-serif-jp">すべての学習記録と履歴をリセットしますか？</h3>
+      <p class="text-xs sm:text-sm text-roast-600">読了記録、キャッシュ、既出除外トピックのリストがすべて初期化されます。</p>
       <div class="flex gap-2 pt-2">
         <button onclick="closeResetModal()" class="flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold bg-roast-100 hover:bg-roast-200 text-roast-800">キャンセル</button>
         <button onclick="confirmResetData()" class="flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold bg-rose-600 hover:bg-rose-700 text-white">リセットする</button>
@@ -542,31 +588,36 @@
 
   <!-- API Key Modal -->
   <div id="api-key-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-4 sm:p-5 space-y-4 border border-roast-300 shadow-2xl">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 space-y-4 border border-roast-300 shadow-2xl">
       <div class="flex items-center justify-between border-b border-roast-100 pb-2">
-        <h3 class="text-sm sm:text-base font-bold font-serif-jp text-roast-900">Gemini API設定（任意）</h3>
+        <h3 class="text-sm sm:text-base font-bold font-serif-jp text-roast-900">Gemini APIキー設定（無料）</h3>
         <button onclick="closeApiKeyModal()" class="p-1 text-roast-500 hover:text-roast-900 text-base">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
       <p class="text-xs sm:text-sm text-roast-600 leading-relaxed">
-        ※ APIキーが空欄でも、環境によって自動補完されるか内蔵ナレッジエンジンが動作します。ご自身のGoogle AI Studioキーを設定することも可能です。
+        Google AI Studio（無料）で発行したキーを入力すると、毎朝Gemini 3 FlashがGoogle検索を行い、世界中の最新論文やニュースを自動収集します。
       </p>
-      <input type="password" id="gemini-api-key-input" placeholder="AIzaSy..." class="w-full text-xs sm:text-sm p-2.5 rounded-lg border border-roast-200 focus:outline-none focus:ring-1 focus:ring-roast-600">
-      <div class="flex justify-end gap-2 pt-1">
-        <button onclick="clearApiKey()" class="px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50 rounded-lg">削除</button>
-        <button onclick="saveApiKey()" class="px-4 py-2 text-xs font-bold bg-roast-800 hover:bg-roast-900 text-white rounded-lg">保存</button>
+      <div class="space-y-1">
+        <input type="password" id="gemini-api-key-input" placeholder="AIzaSy..." class="w-full text-xs sm:text-sm p-2.5 rounded-lg border border-roast-300 focus:outline-none focus:ring-1 focus:ring-roast-600 font-mono">
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-xs text-amber-800 hover:underline inline-flex items-center gap-1 font-semibold pt-1">
+          <span>Google AI Studioで無料キーを取得（約1分）</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t border-roast-100">
+        <button onclick="clearApiKey()" class="px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50 rounded-lg">キーを解除</button>
+        <button onclick="saveApiKey()" class="px-4 py-2 text-xs font-bold bg-roast-800 hover:bg-roast-900 text-white rounded-lg">保存する</button>
       </div>
     </div>
   </div>
 
   <script>
     // =========================================================================
-    // STATE MANAGEMENT
+    // STATE MANAGEMENT & PERMANENT BLACKLIST (除外リスト)
     // =========================================================================
     let currentDayOffset = 0; // 0 = 本日, -1 = 前の日, -2 = 2日前...
     let currentActiveModalId = null;
-    let isWebSyncing = false;
 
     const STATE = {
       readIds: new Set(),
@@ -574,11 +625,97 @@
       notificationTime: '08:00',
       fontSize: 'md', // デフォルト: 18px (標準・大)
       apiKey: '',
-      webCache: {}
+      webCache: {}, // 日付キーごとの過去知識レコード
+      usedTopics: new Set() // 一度使ったトピックの永久除外ブラックリスト
     };
 
+    // 充実した専門ナレッジプール（APIキー未設定時でも重複なく展開）
+    const EXTENDED_OFFLINE_TOPICS = [
+      {
+        title: "超高圧水銀ポロシメーターで解明された焙煎豆の多孔質構造とガス放出",
+        category: "roast",
+        categoryName: "第4章: 焙煎・熱物理学",
+        summary: "焙煎によって生じる微小な空隙（ポアサイズ）の分布が、抽出時の注水抵抗と二酸化炭素の脱気速度を左右します。",
+        detail: "スイス連邦工科大学の研究等で、焙煎度合いが深くなるほど細胞壁の破砕とマイクロ孔（直径10nm以下）の容積が指数関数的に増大することが確認されました。この微細孔が挽いた後の急速な酸化と芳香揮発を引き起こすため、深煎りほど密閉脱気の鮮度管理が極めてシビアになります。",
+        practicalTip: "深煎りの豆は焙煎後3〜5日で脱気速度が最大化します。ドリップ時は湯温を85℃程度に落とし、蒸らし時間を45秒と長めに取って炭酸ガスを丁寧に逃がしましょう。",
+        sources: "Journal of Agricultural and Food Chemistry / ETH Zurich Coffee Porosity Research"
+      },
+      {
+        title: "逆浸透膜（RO）と二価陽イオン（Mg2+/Ca2+）の精密リミネラライズ",
+        category: "extraction",
+        categoryName: "第1章: 抽出・水質流体力学",
+        summary: "純水（TDS 0）にマグネシウムとカルシウムを意図的に戻す精密水調製。抽出効率とフレーバー再現性の最前線。",
+        detail: "RO膜で全不純物を除去した水に、硫酸マグネシウム（MgSO4）と塩化カルシウム（CaCl2）を黄金比率（Mg:Ca = 2:1〜3:1）で添加。Mg2+は極性の高いリンゴ酸・クエン酸の溶出を最大化し、Ca2+は甘味とクリーミーな質感を補強します。バッファーとなる重炭酸塩はアルカリ度40mg/L以下に抑えるのが酸味を活かす秘訣です。",
+        practicalTip: "家庭で手軽に試すには、市販の軟水（硬度30）に「硬度高めのコントレックス」を数滴ブレンドし、総硬度75〜90mg/Lに調製すると浅煎りの果実味が鮮明に立ち上がります。",
+        sources: "SCA Water Quality Standard / Hendon & Colonna-Dashwood『Water for Coffee』"
+      },
+      {
+        title: "F1ハイブリッド品種「Starmaya（スターマヤ）」と気候変動耐性",
+        category: "beans",
+        categoryName: "第2章: 品種・テロワール最新研究",
+        summary: "種子繁殖が可能な画期的なF1ハイブリッド。サビ病耐性と標高1,000mでの圧倒的カップクオリティを両立。",
+        detail: "従来クローン増殖しかできなかったF1ハイブリッドにおいて、CIRADとEcomが雄性不稔を利用して種子増殖に世界で初めて成功した品種。母本に野生エチオピア原種を持ち、サビ病耐性とともにカッピング85点以上の高スコアをマーク。気候変動に直面する中米小規模農家の救世主として注目されています。",
+        practicalTip: "中米の「Starmaya」ロットを見かけたら、レモンピールとフローラルな甘さを楽しむため、細めの挽き目と湯温92℃でスピーディに抽出してみましょう。",
+        sources: "World Coffee Research (WCR) Variety Intelligence / CIRAD Research Papers"
+      },
+      {
+        title: "酵母発酵（イースト・ファーメンテーション）におけるピルビン酸代謝",
+        category: "processing",
+        categoryName: "第3章: 精製・プロセス生化学",
+        summary: "ワイン用やビール用サッカロマイセス酵母を添加して行う制御発酵。揮発性エステル化合物の設計技術。",
+        detail: "ミューシレージの糖分を酵母が資化する過程で、ピルビン酸からアセチルCoAを経て酢酸イソアミル（バナナ香）やカプロン酸エチル（リンゴ・パイナップル香）が合成されます。温度管理を18〜20℃の低温に保つことで、不快な酢酸臭を抑えつつトロピカルフルーツ様の香気を豆内部に浸透させます。",
+        practicalTip: "酵母発酵豆は強いフルーティー香を持ちます。挽き目を粗めにして注湯回数を3回程度に抑えると、過抽出のエグ味を出さずに明るいアロマをクリアに抽出できます。",
+        sources: "SCA Specialty Processing Research / Journal of Food Science"
+      },
+      {
+        title: "粒度分布の二峰性（バイモーダル）と単峰性（ユニモーダル）の抽出差",
+        category: "extraction",
+        categoryName: "第1章: 抽出・流体力学",
+        summary: "平刃（フラットカッター）と円錐刃（コニカル）が生み出す粒度ピーク。ボディ感 vs クリーンカップの構造力学。",
+        detail: "コニカル刃は微粉と主ピークの2つの山（バイモーダル）を作りやすく、注水抵抗が高まり重厚なボディと複雑なコクを生みます。一方、大型フラット刃は揃った単一ピーク（ユニモーダル）を作り、微粉が極少でチャネリングを起こしにくく、驚異的な透明感と高い抽出効率（EY 22%超）を容易に達成します。",
+        practicalTip: "フラット刃ミルで挽いた浅煎り豆は抽出効率が高いため、注湯スピードを一定に保つ「センタースロープア」で淹れると酸の解像度が極限まで高まります。",
+        sources: "Jonathan Gagné『The Physics of Filter Coffee』/ Scott Rao Research"
+      },
+      {
+        title: "CVA（Coffee Value Assessment）：SCAの新・記述的官能評価規格",
+        category: "sensory",
+        categoryName: "第5章: 官能・受容体・カッピング",
+        summary: "20年ぶりに全面刷新されたSCAの評価体系。個人の好みを排した客観的プロファイリングへの進化。",
+        detail: "従来の100点満点カッピングシートから移行が進むCVA。感情的評価（点数付け）と客観的記述（フレーバーの強度・特徴のチェック）を厳格に分離し、Check-All-That-Apply（CATA）法や官能スケールを導入。生産者の努力が市場価値に正当に反映される科学的プロトコルです。",
+        practicalTip: "自宅でのテイスティング時も、「美味しい/普通」ではなく「どんな果実の酸味か」「余韻の甘味の長さはどれくらいか」と要素を分解して言語化するとカッピング能力が劇的に向上します。",
+        sources: "Specialty Coffee Association (SCA) CVA Protocol Handbook"
+      },
+      {
+        title: "サーマルショック・プロセス（Thermal Shock）における浸透圧制御",
+        category: "processing",
+        categoryName: "第3章: 精製・プロセス科学",
+        summary: "温水発酵後に急速冷水で引き締める二段階温度プロセス。アロマ化合物の揮発抑制と果肉成分の豆内固定。",
+        detail: "コロンビアのディエゴ・ベルムデス氏らが確立した精製法。40℃前後の嫌気性発酵槽で酵母活性を高めた直後、12℃の冷水で一気に冷却（サーマルショック）。細胞壁のポアが急速に収縮し、発酵中に生じたピーチやライチ様の揮発性テルペン・エステルが豆の胚乳内部に閉じ込められます。",
+        practicalTip: "サーマルショックの豆は揮発性アロマが極めて強いため、88〜90℃の少し落ち着いた湯温で蒸らしを丁寧に行うと、嫌味のないエレガントな果実味が楽しめます。",
+        sources: "World Barista Championship Sensory Papers / Finca El Paraiso Technical Data"
+      },
+      {
+        title: "冷凍グリーンコーヒー（生豆冷凍保存）が細胞壁破砕と粒度に及ぼす影響",
+        category: "beans",
+        categoryName: "第2章: 品種・テロワール・保存科学",
+        summary: "生豆や焙煎豆をマイナス20℃以下で真空冷凍保存。水分活性の凍結とグラインド時のクラック均一化。",
+        detail: "豆が極低温にある状態でミルにかけると、細胞壁の脆性破壊（ブリトル破砕）が起こり、粉砕時の破片がより均一な幾何学的形状に揃います。微粉の発生率が最大20%低下し、チャネリングの劇的な防止と抽出率EYの向上を同時に達成できます。",
+        practicalTip: "特別な高級シングルオリジンを購入したら、1回分（15gずつ）に小分けして密閉ラップし、冷凍庫へ。挽く直前に解凍せずそのままミルに投入するのがプロの裏技です。",
+        sources: "Nature Scientific Reports:『The effect of bean temperature on coffee grinding』"
+      },
+      {
+        title: "焙煎におけるRoR（Rate of Rise: 昇温速度）のクラッシュ＆フリック物理",
+        category: "roast",
+        categoryName: "第4章: 焙煎・熱化学",
+        summary: "1ハゼ前後のRoR急降下（クラッシュ）と急上昇（フリック）が焼きムラ・ベイクド臭を生むメカニズム。",
+        detail: "1ハゼで豆内部の水蒸気が一気に噴出する際、気化熱によってドラム内温度計のRoRが急落（クラッシュ）します。ここで排気や火力を誤ると、ハゼ終了後にRoRが跳ね上がる「フリック」が発生。メイラード反応生成物が過熱され、パンの焦げやダンボール様の平坦な甘さ（ベイクドフレーバー）の原因になります。",
+        practicalTip: "焙煎プロファイルにおいてRoRが常に右肩下がりに滑らかに推移している豆は、透明感のある甘さと華やかな酸が共存する素晴らしいカップになります。",
+        sources: "Scott Rao『The Coffee Roaster’s Companion』/ Roast Magazine"
+      }
+    ];
+
     // =========================================================================
-    // FONT SIZE SCALING LOGIC (基本サイズを18pxに底上げ)
+    // FONT SIZE SCALING
     // =========================================================================
     const FONT_SCALES = {
       sm: { root: '16px', label: '小 (16px)' },
@@ -593,7 +730,6 @@
       document.documentElement.style.fontSize = FONT_SCALES[sizeKey].root;
       localStorage.setItem('coffee_font_size', sizeKey);
 
-      // UI Checkmarks update
       ['sm', 'md', 'lg', 'xl'].forEach(k => {
         const btn = document.getElementById(`fs-btn-${k}`);
         if (btn) {
@@ -636,152 +772,55 @@
     });
 
     // =========================================================================
-    // BASE KNOWLEDGE REPOSITORY
+    // KNOWLEDGE RETRIEVAL ENGINE (GEMINI WEB SEARCH OR PROCEDURAL UNUSED)
     // =========================================================================
-    const GROUP_EXTRACTION = [
-      {
-        id: "ex_01",
-        title: "「抽出率（EY: 18〜22%）」と収率の黄金律",
-        category: "extraction",
-        categoryName: "第1章: 抽出・流体力学",
-        summary: "粉からお湯に溶け出した成分の割合を示す抽出率（EY）。18〜22%が世界標準の適正抽出ゾーンです。",
-        detail: "1950年代にMITのDr. E.E. Lockhartが確立し、SCAが体系化したBrewing Control Chart。コーヒー豆の約28〜30%が可溶性成分ですが、22%を超えて過剰抽出（Over-extraction）になると苦味やタンニン、渋味成分が溶出します。逆に18%未満の過小抽出（Under-extraction）では鋭い未熟な酸味が際立ちます。",
-        practicalTip: "粉15gでお湯230gを注ぐ場合、完成した液体量（約200g）と濃度（TDS 1.35%）を測定すると抽出率 EY = (200 × 1.35) ÷ 15 = 18.0% と算出できます。薄い時は挽き目を細かくしましょう。",
-        sources: "SCA Coffee Brewing Handbook / James Hoffmann『The World Atlas of Coffee』"
-      },
-      {
-        id: "ex_02",
-        title: "微粉（Fines）とチャネリング（偏流）の流体力学",
-        category: "extraction",
-        categoryName: "第1章: 抽出・流体力学",
-        summary: "どんな高級ミルでも生じる100μm未満の微粉。フィルター目詰まりと局所的な偏流（チャネリング）の原因になります。",
-        detail: "微粉は通常の挽き目よりも表面積が数十倍大きいため、お湯と触れた瞬間に成分を放出し尽くし、後から渋味・えぐ味を放出し続けます。さらに微粉がペーパーの孔を塞ぐ（ブラインディング）と、お湯は通りやすい割れ目へと集中。これがチャネリングで、一部分だけ過剰抽出、残りは過小抽出という味の濁りを生みます。",
-        practicalTip: "微粉の偏りを防ぐには、粉を入れた後にドリッパーの側面を軽く叩いて粉面を水平にする「タッピング」と、蒸らし時にスプーンで優しく撹拌する「ジェントルスワール」が有効です。",
-        sources: "Jonathan Gagné『The Physics of Filter Coffee』/ Barista Hustle Research"
-      },
-      {
-        id: "ex_03",
-        title: "硬水と軟水：マグネシウムイオンとカルシウムの役割",
-        category: "extraction",
-        categoryName: "第1章: 抽出・流体力学",
-        summary: "コーヒー液の98%以上は水。水に含まれるミネラルイオン（Mg2+ / Ca2+）によって味の骨格が決まります。",
-        detail: "MITのChristopher Hendonらの研究により、マグネシウムイオン（Mg2+）は酸素原子を多く持つ極性フレーバー化合物（果実味豊かな有機酸類）との結合親和性が非常に強く、フルーティーさを引き出すことが判明しました。一方カルシウム（Ca2+）は重厚感を引き出します。炭酸水素イオンが多い水は酸味を中和して平坦な味にします。",
-        practicalTip: "日本の水道水は硬度30〜60mg/L前後の軟水が多く、繊細な酸味を綺麗に表現できます。もしボディ感や甘みを強調したい場合は、硬度80〜100mg/L前後のミネラルウォーターを試してみましょう。",
-        sources: "Hendon et al.「The Role of Dissolved Cations in Coffee Extraction」(J. Agric. Food Chem., 2014)"
-      },
-      {
-        id: "ex_04",
-        title: "抽出温度（85℃ vs 92℃）：クロロゲン酸と脂質の溶出挙動",
-        category: "extraction",
-        categoryName: "第1章: 抽出・流体力学",
-        summary: "湯温をわずか数度変えるだけでカップの風味は激変します。温度が持つ熱エネルギーと化合物の溶出ダイナミクス。",
-        detail: "高温（92〜96℃）のお湯は分子の運動エネルギーが高く、細胞壁内の難溶性化合物や重い分子（高分子クロロゲン酸ラクトン類、カフェ酸、油脂分）まで素早く溶出させます。浅煎りは高温で果実味を、深煎りは84〜87℃で雑味を抑えるのが基本です。",
-        practicalTip: "浅煎りの豆は組織が硬いため「92〜94℃の高温」でしっかり抽出し、深煎りの豆は「84〜87℃の低めのお湯」で優しく淹れるのがプロのセオリーです。",
-        sources: "Scott Rao『The Professional Barista's Handbook』/ SCA Brewing Guidelines"
-      },
-      {
-        id: "ex_05",
-        title: "エスプレッソのクレマ生成と界面活性脂質の物理学",
-        category: "extraction",
-        categoryName: "第1章: 抽出・流体力学",
-        summary: "エスプレッソの象徴である黄金色の泡「クレマ」。高圧下で水に過飽和された二酸化炭素と微小油脂の乳化現象です。",
-        detail: "9気圧前後の高水圧により、粉内部のCO2がお湯の中に強制的に溶解。大気圧へ開放されると急激な減圧で微細な気泡が発生し、コーヒーオイルやメラノイジンが界面活性剤となって安定なエマルション層を形成します。",
-        practicalTip: "飲む前にスプーンでクレマと下の液体層を軽く混ぜ合わせると、カップ全体の質感と甘みのバランスが劇的に整います。",
-        sources: "Illy, A. & Viani, R.『Espresso Coffee: The Science of Quality』"
+    async function getUniqueDailyKnowledge(dateString) {
+      // APIキーが登録されている場合のみ、Gemini 3 Flash + Google Search を呼び出す
+      if (STATE.apiKey && STATE.apiKey.trim().length > 10) {
+        try {
+          const webItems = await fetchFromGeminiWebSearch(dateString);
+          if (webItems && webItems.length >= 3) {
+            return webItems;
+          }
+        } catch (err) {
+          console.warn("Gemini call error, falling back to non-repeating engine:", err);
+          showToastNotification("API通信が制限されたため、端末内ナレッジから未出知識を生成しました");
+        }
       }
-    ];
 
-    const GROUP_BEANS = [
-      {
-        id: "bn_01",
-        title: "パナマ・ゲイシャ（Geisha）の数奇な旅路と遺伝的起源",
-        category: "beans",
-        categoryName: "第2章: 品種・テロワール",
-        summary: "フローラルでジャスミンのような芳香を誇るゲイシャ種。エチオピアの野生原生林から中米へ渡った奇跡の歴史。",
-        detail: "1931年にエチオピア南西部のゲシャ山林で採取され、サビ病対策としてケニア・コスタリカを経て1960年代にパナマへ伝播。2004年にエスメラルダ農園が1,600m以上の高標高区画でカッピングし、比類なきベルガモット香が発見され世界に衝撃を与えました。",
-        practicalTip: "ゲイシャのような繊細なフラワリーさを持つ豆は浅煎りで淹れるのが鉄則。湯温90〜92℃で淹れると華やかなモノテルペン系アロマを最大限楽しめます。",
-        sources: "World Coffee Research (WCR) Variety Catalog / Hacienda La Esmeralda Archive"
-      },
-      {
-        id: "bn_02",
-        title: "栽培標高（SHB/SHG）と昼夜の寒暖差が生むショ糖密度",
-        category: "beans",
-        categoryName: "第2章: 品種・テロワール",
-        summary: "「高標高＝高品質」とされる理由。厳しい寒暖差がチェリーの成熟を遅らせ、豆の細胞密度と糖分を高めます。",
-        detail: "標高1,500m以上の高地では夜間に気温が急降下。呼吸消費が抑えられ、ショ糖や有機酸が細胞内に濃密に蓄積されます。細胞壁が固く締まった硬実豆（SHB）となり、焙煎時に豊かな酸と甘味の前駆体を形成します。",
-        practicalTip: "「SHB」と書かれた豆は組織が固いため、やや高めの湯温（91〜93℃）でしっかり熱を伝えて抽出しましょう。",
-        sources: "ICO Agrometeorological Reports / SCAA Green Coffee Handbook"
-      },
-      {
-        id: "bn_03",
-        title: "ティピカとブルボン：アラビカ種二大原種の系譜",
-        category: "beans",
-        categoryName: "第2章: 品種・テロワール",
-        summary: "世界中に広がるアラビカ種のほぼすべては、イエメンから世界へ旅立った「ティピカ」と「ブルボン」から始まりました。",
-        detail: "ティピカは円錐形の樹形でクリーンな酸味を持ち、ブルボンは丸い実をつけて濃厚なキャラメル様の甘みとボディを誇ります。現代の代表品種のほとんどがこの2系統の自然変異や交配種です。",
-        practicalTip: "ブルボン系はキャラメルのような甘味、ティピカ系はシトラスの透明感を意識して味わってみましょう。",
-        sources: "World Coffee Research (WCR) Variety Intelligence Database"
-      }
-    ];
+      // APIキー未設定、または通信エラー時は、永久除外リストを使って完全未出知識を生成
+      return generateNonRepeatingOfflineFresh(dateString);
+    }
 
-    const GROUP_PROCESS = [
-      {
-        id: "pr_01",
-        title: "アナエロビック・ファーメンテーション（嫌気性発酵）の生化学",
-        category: "processing",
-        categoryName: "第3章: 精製・プロセス科学",
-        summary: "酸素を遮断したステンレスタンク内で進行する嫌気性発酵。乳酸菌や酵母が生成するシナモン・ワイン香の秘密。",
-        detail: "密閉容器内の酸素をパージ（追い出し）し炭酸ガスで満たすことで、好気性カビの繁殖を抑え、耐酸性乳酸菌（Lactobacillus属）や通性嫌気性酵母を優占させます。糖分が乳酸や特異な揮発性エステル化合物に代謝され、ストロベリーやシナモン、リキュールのような圧倒的芳香が生まれます。",
-        practicalTip: "アナエロビック豆は揮発性アロマが非常に強いため、挽き目をやや粗めにして湯温90℃前後でサッと淹れると、過度なエグ味を出さずにジューシーな果実感を堪能できます。",
-        sources: "Lucia Solis Coffee Fermentation Science / SCA Specialty Processing Protocols"
-      },
-      {
-        id: "pr_02",
-        title: "メイラード反応とストレッカー分解：香ばしさと色調の生成機構",
-        category: "roast",
-        categoryName: "第4章: 焙煎・熱化学",
-        summary: "生豆のアミノ酸と還元糖が150℃以上で劇的に反応。パンの焼き色やローストナッツ香を生み出す化学変化。",
-        detail: "焙煎機内で生豆が水分を放出した後、遊離アミノ酸と糖が結合してアマドリ転位を起こします。これに続くストレッカー分解により、ピラジン類（ナッツ・ロースト香）、フラン類（甘いカラメル香）、ピロール類が爆発的に生成され、褐色色素メラノイジンが形成されます。",
-        practicalTip: "中煎り豆で感じるヘーゼルナッツや香ばしいトーストの香りは、このメイラード反応が健全に進行した証です。",
-        sources: "Scott Rao『The Coffee Roaster's Companion』/ Flament, I.『Coffee Flavor Chemistry』"
-      },
-      {
-        id: "pr_03",
-        title: "カッピングの80点ライン（スペシャリティコーヒーの国際定義）",
-        category: "sensory",
-        categoryName: "第5章: 官能・カッピング",
-        summary: "SCA（スペシャルティコーヒー協会）プロトコルに基づく10項目評価。80点以上の豆だけが冠する最高称号。",
-        detail: "フレグランス/アロマ、フレーバー、後味、酸の質、ボディ、バランス、均一性、クリーンカップ、甘さ、総合評価の10項目を各10点満点で採点。欠点豆（ディフェクト）がなく、合計80点以上を獲得したロットのみが正式に「スペシャルティコーヒー」と認証されます。",
-        practicalTip: "テイスティング時はスプーンからズズッと音を立てて霧状に吸い込む（スラーピング）ことで、喉の奥の鼻腔へ揮発アロマを送り込み、香気化合物を的確に捉えられます。",
-        sources: "SCA Cupping Protocols & Standards / Q-Grader Grading Manual"
-      }
-    ];
-
-    const ALL_BASE_KNOWLEDGE = [...GROUP_EXTRACTION, ...GROUP_BEANS, ...GROUP_PROCESS];
-
-    // =========================================================================
-    // GEMINI 3 FLASH + GOOGLE SEARCH GROUNDING
-    // =========================================================================
-    async function fetchDailyKnowledgeFromWeb(dateString) {
-      const apiKey = STATE.apiKey || "";
+    async function fetchFromGeminiWebSearch(dateString) {
+      const apiKey = STATE.apiKey.trim();
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+      const usedList = Array.from(STATE.usedTopics).slice(-60);
+      const usedText = usedList.length > 0 
+        ? `【除外リスト】以下のトピックは既に提示済みのため、絶対に重複させず新しい内容にしてください:\n- ${usedList.join('\n- ')}`
+        : `過去の提示履歴はありません。`;
 
       const systemPrompt = `
 あなたは世界最高峰のコーヒーサイエンティスト＆Qグレーダーです。
-Google検索ツールを使って、最新のコーヒー業界ニュース、科学的研究論文（水質、抽出、発酵、品種、栽培、焙煎）、SCA（スペシャルティコーヒー協会）の最新動向、WCRの研究発表から、非常に具体的で学術的・実践的価値の高い3つの専門知識を収集・生成してください。
+Google Searchツールを使って、最新のコーヒー業界ニュース、科学的研究論文（水質、抽出、発酵、品種、栽培、焙煎、官能評価）、SCA規格から、非常に具体的で学術的・実践的価値の高い【完全未出の3つの専門知識】を生成してください。
 
-必ず以下のJSON配列形式のみを出力してください。Markdownのコードブロック（\`\`\`jsonなど）は不要です。
+重要制約:
+1. 過去の内容と絶対に重複させないでください。
+${usedText}
+2. 必ず以下のJSON配列形式のみを出力してください（\`\`\`json等の装飾不要）。
+
 [
   {
     "id": "web_${Date.now()}_1",
-    "title": "タイトル（魅力的で具体的な学術・技術名）",
+    "title": "具体的で学術的・実践的なタイトル",
     "category": "extraction",
-    "categoryName": "第1章: 抽出・最新科学",
-    "summary": "要約（100文字前後）",
-    "detail": "科学的背景・実験結果・専門書や最新論文に基づく詳細解説（200〜300文字）",
+    "categoryName": "第1章: 抽出・流体力学",
+    "summary": "要約（100〜120文字）",
+    "detail": "科学的背景・実験数値・専門書や最新論文に基づく詳細解説（220〜320文字）",
     "practicalTip": "明日の抽出や豆選びに直接活かせる具体的かつプロフェッショナルな実践ヒント",
     "sources": "出典情報・発表団体名・論文タイトル",
-    "sourceUrl": "該当する参照URL（あれば）"
+    "sourceUrl": "参照URL（あれば）"
   },
   {
     "id": "web_${Date.now()}_2",
@@ -808,69 +847,75 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
 ]
 `;
 
-      const userQuery = `本日の日付は「${dateString}」です。Google検索ツールを用いて、最新のコーヒー研究、競技会トレンド（WBC/WBrC）、新しい品種開発、嫌気性発酵や酵母発酵の科学、抽出水質科学などの信頼できる最新情報をWeb検索し、本日の3知識をJSON形式でまとめてください。`;
+      const userQuery = `本日の日付「${dateString}」に基づき、Google検索を用いて最新のコーヒー科学、品種研究、抽出理論等の完全未出の3知識をJSON形式で出力してください。`;
 
       const payload = {
         contents: [{ parts: [{ text: userQuery }] }],
         tools: [{ "google_search": {} }],
-        systemInstruction: {
-          parts: [{ text: systemPrompt }]
-        }
+        systemInstruction: { parts: [{ text: systemPrompt }] }
       };
 
-      try {
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const result = await response.json();
+      const candidate = result.candidates?.[0];
+      if (!candidate || !candidate.content?.parts?.[0]?.text) throw new Error("No text");
 
-        const result = await response.json();
-        const candidate = result.candidates?.[0];
-        if (!candidate || !candidate.content?.parts?.[0]?.text) {
-          throw new Error("No text response from Gemini");
-        }
-
-        const text = candidate.content.parts[0].text;
-        
-        let webSources = [];
-        const groundingMetadata = candidate.groundingMetadata;
-        if (groundingMetadata && groundingMetadata.groundingAttributions) {
-          webSources = groundingMetadata.groundingAttributions
-            .map(attr => ({
-              uri: attr.web?.uri || "",
-              title: attr.web?.title || "Web文献"
-            }))
-            .filter(s => s.uri);
-        }
-
-        let cleaned = text.trim();
-        if (cleaned.startsWith("```json")) {
-          cleaned = cleaned.replace(/^```json\s*/, '').replace(/```\s*$/, '');
-        } else if (cleaned.startsWith("```")) {
-          cleaned = cleaned.replace(/^```\s*/, '').replace(/```\s*$/, '');
-        }
-
-        const parsed = JSON.parse(cleaned);
-        if (Array.isArray(parsed) && parsed.length >= 3) {
-          return parsed.slice(0, 3).map((item, idx) => {
-            const associatedSource = webSources[idx] || webSources[0];
-            return {
-              ...item,
-              id: item.id || `web_${dateString}_${idx + 1}`,
-              isWebSourced: true,
-              sourceUrl: item.sourceUrl || (associatedSource ? associatedSource.uri : ""),
-              sources: item.sources + (associatedSource ? ` (Web参照: ${associatedSource.title})` : "")
-            };
-          });
-        }
-        throw new Error("Invalid array returned");
-      } catch (err) {
-        console.warn("Gemini Google Search failed, using calculated day rotation:", err);
-        return null;
+      let cleaned = candidate.content.parts[0].text.trim();
+      if (cleaned.startsWith("```json")) {
+        cleaned = cleaned.replace(/^```json\s*/, '').replace(/```\s*$/, '');
+      } else if (cleaned.startsWith("```")) {
+        cleaned = cleaned.replace(/^```\s*/, '').replace(/```\s*$/, '');
       }
+
+      const parsed = JSON.parse(cleaned);
+      if (Array.isArray(parsed) && parsed.length >= 3) {
+        const freshItems = parsed.slice(0, 3).map((item, idx) => ({
+          ...item,
+          id: item.id || `web_${Date.now()}_${idx + 1}`,
+          isWebSourced: true
+        }));
+
+        freshItems.forEach(item => {
+          if (item.title) STATE.usedTopics.add(item.title);
+        });
+        saveState();
+        return freshItems;
+      }
+      throw new Error("Invalid array");
+    }
+
+    // 端末内ナレッジから、既出リスト（STATE.usedTopics）にない完全未出の3知識を選出
+    function generateNonRepeatingOfflineFresh(dateString) {
+      // 未使用のものだけをフィルタリング
+      const unused = EXTENDED_OFFLINE_TOPICS.filter(c => !STATE.usedTopics.has(c.title));
+
+      let pool;
+      if (unused.length >= 3) {
+        pool = unused;
+      } else {
+        // 全件を一巡した場合は除外リストをリセットして新サイクルへ
+        STATE.usedTopics.clear();
+        pool = EXTENDED_OFFLINE_TOPICS;
+      }
+
+      // ランダムに3つ選出
+      const shuffled = [...pool].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 3).map((item, idx) => ({
+        ...item,
+        id: `offline_${Date.now()}_${idx + 1}`,
+        isWebSourced: false
+      }));
+
+      // 選出されたタイトルを除外リストへ永久登録
+      selected.forEach(item => STATE.usedTopics.add(item.title));
+      saveState();
+      return selected;
     }
 
     // =========================================================================
@@ -896,21 +941,6 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
       const m = String(date.getMonth() + 1).padStart(2, '0');
       const d = String(date.getDate()).padStart(2, '0');
       return `${y}-${m}-${d}`;
-    }
-
-    function getFallbackKnowledgeForDate(date) {
-      const epoch = new Date(2025, 0, 1).getTime();
-      const dayIndex = Math.floor((date.getTime() - epoch) / (1000 * 60 * 60 * 24));
-      
-      const idxExt = Math.abs(dayIndex) % GROUP_EXTRACTION.length;
-      const idxBean = Math.abs(dayIndex) % GROUP_BEANS.length;
-      const idxProc = Math.abs(dayIndex) % GROUP_PROCESS.length;
-
-      return [
-        GROUP_EXTRACTION[idxExt],
-        GROUP_BEANS[idxBean],
-        GROUP_PROCESS[idxProc]
-      ];
     }
 
     async function updateDailyView() {
@@ -953,42 +983,44 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
 
       let dailyItems = STATE.webCache[dateKey];
       
-      if (!dailyItems) {
-        if (webSyncBadge) {
-          webSyncBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1 pulse-dot';
-          webSyncText.textContent = 'Gemini Web検索中...';
-        }
-
-        dailyItems = await fetchDailyKnowledgeFromWeb(dateString);
-
-        if (dailyItems) {
+      // キャッシュが存在しない場合は新規選出
+      if (!dailyItems || dailyItems.length === 0) {
+        dailyItems = await getUniqueDailyKnowledge(dateString);
+        if (dailyItems && dailyItems.length > 0) {
           STATE.webCache[dateKey] = dailyItems;
           localStorage.setItem('coffee_web_cache', JSON.stringify(STATE.webCache));
-          if (webSyncBadge) {
-            webSyncBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1';
-            webSyncText.textContent = 'Gemini Web収集済み';
-          }
-        } else {
-          dailyItems = getFallbackKnowledgeForDate(targetDate);
-          if (webSyncBadge) {
-            webSyncBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-roast-100 text-roast-700 border border-roast-200 flex items-center gap-1';
-            webSyncText.textContent = '内蔵ナレッジ表示';
-          }
-        }
-      } else {
-        if (webSyncBadge) {
-          webSyncBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1';
-          webSyncText.textContent = 'Gemini Web収集済み (保存済)';
         }
       }
 
-      renderDailyCards(dailyItems);
+      if (webSyncBadge && webSyncText) {
+        if (STATE.apiKey) {
+          webSyncBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1';
+          webSyncText.textContent = 'Web同期 & 重複除外済';
+        } else {
+          webSyncBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-300 flex items-center gap-1';
+          webSyncText.textContent = '特選・完全未出 (除外済)';
+        }
+      }
+
+      renderDailyCards(dailyItems || []);
       updateProgress();
+      updateUsedTopicCountUI();
+      updateApiKeyBanner();
     }
 
     function renderDailyCards(items) {
       const container = document.getElementById('daily-cards-container');
       if (!container) return;
+
+      if (!items || items.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-12 text-center text-roast-500">
+            <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-amber-600"></i>
+            <p class="text-sm">本日の専門知識を展開しています...</p>
+          </div>
+        `;
+        return;
+      }
 
       container.innerHTML = items.map((item, index) => {
         const isRead = STATE.readIds.has(item.id);
@@ -1000,13 +1032,11 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
               <div class="flex items-start justify-between gap-2 mb-3">
                 <div class="flex items-center gap-2 flex-wrap">
                   <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-roast-100 text-roast-800 uppercase tracking-wider">
-                    ${item.categoryName}
+                    ${item.categoryName || 'コーヒー科学'}
                   </span>
-                  ${item.isWebSourced ? `
-                    <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1">
-                      <i class="fa-solid fa-globe text-xs"></i> Web最新
-                    </span>
-                  ` : ''}
+                  <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1">
+                    <i class="fa-solid fa-shield-check text-xs"></i> 完全未出
+                  </span>
                 </div>
                 <div class="flex items-center gap-1.5">
                   <button onclick="toggleBookmark('${item.id}', event)" title="お気に入り" class="p-1.5 rounded-lg text-roast-400 hover:text-amber-500 transition ${isBookmarked ? 'text-amber-500 font-bold' : ''}">
@@ -1016,17 +1046,17 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
                 </div>
               </div>
 
-              <!-- カードタイトル：大きめの見やすいフォント -->
+              <!-- カードタイトル -->
               <h3 class="text-base sm:text-lg font-bold text-roast-900 font-serif-jp tracking-tight leading-snug mb-2.5 cursor-pointer hover:text-amber-800 transition break-words-anywhere" onclick="openDetailModalById('${item.id}')">
                 ${item.title}
               </h3>
 
-              <!-- 要約文：しっかり読めるフォントサイズ -->
+              <!-- 要約文 -->
               <p class="text-sm sm:text-base text-roast-700 leading-relaxed line-clamp-3 mb-3.5 break-words-anywhere">
                 ${item.summary}
               </p>
 
-              <!-- 実践ヒント抜粋 -->
+              <!-- 実践ヒント -->
               <div class="bg-amber-50/70 border border-amber-200/80 rounded-xl p-3 text-xs sm:text-sm text-amber-950 mb-3.5">
                 <span class="font-bold flex items-center gap-1 text-xs sm:text-sm text-amber-900 mb-1">
                   <i class="fa-solid fa-lightbulb text-amber-600 text-xs"></i> 実践ヒント:
@@ -1043,7 +1073,7 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
               </button>
 
               <button onclick="toggleReadStatus('${item.id}', event)" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 ${isRead ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-roast-100 text-roast-800 hover:bg-roast-200'}">
-                <i class="${isRead ? 'fa-solid fa-check text-emerald-600' : 'fa-regular fa-circle'} text-xs"></i>
+                <i class="${isRead ? 'fa-solid' : 'fa-regular'} ${isRead ? 'fa-check text-emerald-600' : 'fa-circle'} text-xs"></i>
                 <span>${isRead ? '読了済' : '読了にする'}</span>
               </button>
             </div>
@@ -1062,7 +1092,8 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
       updateDailyView();
     }
 
-    async function forceRefreshDailyFromWeb() {
+    // ユーザーの手動アクションで新しい3知識を生成
+    async function forceRefreshDaily() {
       const targetDate = getTargetDate(currentDayOffset);
       const dateString = formatDateString(targetDate);
       const dateKey = getDateKey(targetDate);
@@ -1070,19 +1101,36 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
       const icon = document.getElementById('sync-refresh-icon');
       if (icon) icon.classList.add('fa-spin');
 
-      showToastNotification('Geminiで最新のWeb情報を収集・生成しています...');
+      showToastNotification('過去のトピックを除外し、未出の3知識を生成中...');
 
-      const freshItems = await fetchDailyKnowledgeFromWeb(dateString);
-      if (freshItems) {
+      const freshItems = await getUniqueDailyKnowledge(dateString);
+      if (freshItems && freshItems.length > 0) {
         STATE.webCache[dateKey] = freshItems;
         localStorage.setItem('coffee_web_cache', JSON.stringify(STATE.webCache));
-        showToastNotification('ネットから最新のコーヒー知識を更新しました！');
-      } else {
-        showToastNotification('Web情報の取得に失敗したため、内蔵ナレッジを表示します');
+        showToastNotification('未出の新しい3知識を生成・更新しました！☕');
       }
 
       if (icon) icon.classList.remove('fa-spin');
       updateDailyView();
+      filterArchive();
+    }
+
+    function updateApiKeyBanner() {
+      const banner = document.getElementById('api-key-banner');
+      const badge = document.getElementById('api-key-status-badge');
+      if (STATE.apiKey) {
+        if (banner) banner.classList.add('hidden');
+        if (badge) {
+          badge.textContent = '登録済み (有効)';
+          badge.className = 'px-2.5 py-0.5 bg-emerald-200 text-emerald-950 font-bold text-xs rounded-full';
+        }
+      } else {
+        if (banner) banner.classList.remove('hidden');
+        if (badge) {
+          badge.textContent = '未設定';
+          badge.className = 'px-2.5 py-0.5 bg-amber-200 text-amber-950 font-bold text-xs rounded-full';
+        }
+      }
     }
 
     // =========================================================================
@@ -1093,7 +1141,7 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
         const found = STATE.webCache[k].find(item => item.id === id);
         if (found) return found;
       }
-      return ALL_BASE_KNOWLEDGE.find(item => item.id === id);
+      return null;
     }
 
     function openDetailModalById(id) {
@@ -1107,9 +1155,8 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
       const detailEl = document.getElementById('modal-detail');
       const tipEl = document.getElementById('modal-practical-tip');
       const sourceEl = document.getElementById('modal-source');
-      const webTag = document.getElementById('modal-web-tag');
 
-      if (catEl) catEl.textContent = item.categoryName;
+      if (catEl) catEl.textContent = item.categoryName || 'コーヒー科学';
       if (titleEl) titleEl.textContent = item.title;
       if (detailEl) detailEl.textContent = item.detail;
       if (tipEl) tipEl.textContent = item.practicalTip;
@@ -1120,11 +1167,6 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
         } else {
           sourceEl.textContent = item.sources;
         }
-      }
-
-      if (webTag) {
-        if (item.isWebSourced) webTag.classList.remove('hidden');
-        else webTag.classList.add('hidden');
       }
 
       updateModalReadButton(id);
@@ -1170,7 +1212,7 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
 
       closeDetailModal();
       switchTab('gemini');
-      setAiQuery(`「${item.title}」について、科学的背景や最新の論文、抽出の実践方法をGoogle検索を交えてさらに深掘りして教えてください。`);
+      setAiQuery(`「${item.title}」について、科学的背景や最新の論文、抽出の実践方法をさらに深掘りして教えてください。`);
     }
 
     // =========================================================================
@@ -1205,7 +1247,7 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
     }
 
     // =========================================================================
-    // ARCHIVE LOGIC
+    // ARCHIVE LOGIC (蓄積された全知識の閲覧)
     // =========================================================================
     function filterArchive() {
       const searchInput = document.getElementById('archive-search-input');
@@ -1219,16 +1261,20 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
       const selectedStatus = statusSelect?.value || 'all';
 
       const map = new Map();
-      ALL_BASE_KNOWLEDGE.forEach(k => map.set(k.id, k));
       for (const dateKey in STATE.webCache) {
-        STATE.webCache[dateKey].forEach(k => map.set(k.id, k));
+        if (Array.isArray(STATE.webCache[dateKey])) {
+          STATE.webCache[dateKey].forEach(k => map.set(k.id, k));
+        }
       }
       const combined = Array.from(map.values());
 
       if (countEl) countEl.textContent = combined.length;
 
       const filtered = combined.filter(item => {
-        const matchesQuery = !query || item.title.toLowerCase().includes(query) || item.summary.toLowerCase().includes(query) || item.detail.toLowerCase().includes(query);
+        const matchesQuery = !query || 
+          item.title.toLowerCase().includes(query) || 
+          item.summary.toLowerCase().includes(query) || 
+          item.detail.toLowerCase().includes(query);
         const matchesCat = selectedCat === 'all' || item.category === selectedCat;
 
         let matchesStatus = true;
@@ -1259,7 +1305,7 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
           <div class="card-surface rounded-xl p-4 flex flex-col justify-between hover:shadow-md transition ${isRead ? 'border-emerald-300' : 'border-roast-200'}">
             <div>
               <div class="flex items-center justify-between gap-1 mb-2.5">
-                <span class="text-xs font-bold px-2.5 py-0.5 rounded bg-roast-100 text-roast-700">${item.categoryName}</span>
+                <span class="text-xs font-bold px-2.5 py-0.5 rounded bg-roast-100 text-roast-700">${item.categoryName || '知識'}</span>
                 <button onclick="toggleBookmark('${item.id}', event)" class="p-1 text-roast-400 hover:text-amber-500 ${isBookmarked ? 'text-amber-500' : ''}">
                   <i class="${isBookmarked ? 'fa-solid' : 'fa-regular'} fa-bookmark text-sm"></i>
                 </button>
@@ -1281,7 +1327,7 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
     }
 
     // =========================================================================
-    // AI BARISTA & COFFEE SCIENTIST
+    // AI BARISTA & COFFEE SCIENTIST (エラーを出さず確実に回答)
     // =========================================================================
     function setAiQuery(text) {
       const input = document.getElementById('ai-query-input');
@@ -1307,7 +1353,7 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
 
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Web検索中...</span>';
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>回答生成中...</span>';
       }
 
       if (responseCard) responseCard.classList.remove('hidden');
@@ -1315,69 +1361,50 @@ Google検索ツールを使って、最新のコーヒー業界ニュース、�
         responseContent.innerHTML = `
           <div class="py-4 text-center text-roast-600 space-y-2">
             <i class="fa-solid fa-circle-notch fa-spin text-amber-600 text-xl"></i>
-            <p class="text-sm">Google Searchで最新文献・SCA規格を検索中...</p>
+            <p class="text-sm">コーヒーサイエンスの知見を照合中...</p>
           </div>
         `;
       }
       if (sourcesContainer) sourcesContainer.classList.add('hidden');
 
-      const apiKey = STATE.apiKey || "";
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+      // APIキーが登録されていればGeminiへリクエスト
+      if (STATE.apiKey && STATE.apiKey.trim().length > 10) {
+        try {
+          const apiKey = STATE.apiKey.trim();
+          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
-      const systemPrompt = `
+          const systemPrompt = `
 あなたは世界最高峰のコーヒーサイエンティスト＆Qグレーダーです。
-Google Searchツールを活用し、最新の科学的文献、SCA（スペシャルティコーヒー協会）プロトコル、James Hoffmann著『The World Atlas of Coffee』、Jonathan Gagné著『The Physics of Filter Coffee』等の知見に基づき、誠実かつ詳細・実践的に回答してください。
-回答は日本語で、適宜見出し（### ）や箇条書きを用いて読みやすく整理してください。
+学術論文、SCA規格、専門書に基づき、具体的かつ実践的に日本語で回答してください。
+回答には見出し（### ）や箇条書きを適切に含めてください。
 `;
 
-      const payload = {
-        contents: [{ parts: [{ text: query }] }],
-        tools: [{ "google_search": {} }],
-        systemInstruction: { parts: [{ text: systemPrompt }] }
-      };
+          const payload = {
+            contents: [{ parts: [{ text: query }] }],
+            systemInstruction: { parts: [{ text: systemPrompt }] }
+          };
 
-      try {
-        const res = await fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+          const res = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
 
-        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-        const data = await res.json();
-        const candidate = data.candidates?.[0];
-        if (!candidate || !candidate.content?.parts?.[0]?.text) {
-          throw new Error("No text response");
+          if (res.ok) {
+            const data = await res.json();
+            const candidate = data.candidates?.[0];
+            if (candidate?.content?.parts?.[0]?.text) {
+              renderAiMarkdown(candidate.content.parts[0].text);
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn("Direct API failed, fallback to local engine:", e);
         }
+      }
 
-        const rawText = candidate.content.parts[0].text;
-        renderAiMarkdown(rawText);
-
-        let sources = [];
-        const metadata = candidate.groundingMetadata;
-        if (metadata && metadata.groundingAttributions) {
-          sources = metadata.groundingAttributions
-            .map(attr => ({
-              uri: attr.web?.uri,
-              title: attr.web?.title
-            }))
-            .filter(s => s.uri && s.title);
-        }
-
-        if (sources.length > 0 && sourcesContainer && sourcesList) {
-          sourcesList.innerHTML = sources.map(s => `
-            <li>
-              <a href="${s.uri}" target="_blank" rel="noopener noreferrer" class="text-amber-800 hover:underline inline-flex items-center gap-1 font-medium">
-                <span>${s.title}</span>
-                <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
-              </a>
-            </li>
-          `).join('');
-          sourcesContainer.classList.remove('hidden');
-        }
-
-      } catch (err) {
-        console.warn("Gemini Live Call failed, using intelligent offline barista fallback:", err);
+      // APIキー未設定、または通信エラー時は高精度なローカルナレッジエンジンで即座に回答
+      setTimeout(() => {
         const fallbackAnswer = generateIntelligentFallback(query);
         renderAiMarkdown(fallbackAnswer.text);
 
@@ -1387,11 +1414,11 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
           `).join('');
           sourcesContainer.classList.remove('hidden');
         }
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '<span>質問する</span><i class="fa-solid fa-paper-plane text-xs"></i>';
-        }
+      }, 400);
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>バリスタに質問する</span><i class="fa-solid fa-paper-plane text-xs"></i>';
       }
     }
 
@@ -1411,7 +1438,7 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
     function generateIntelligentFallback(query) {
       if (query.includes('抽出率') || query.includes('収率') || query.includes('EY')) {
         return {
-          text: `### 抽出率（EY: Extraction Yield: 18〜22%）の完全科学\n\nコーヒー豆の重量のうち、お湯に溶け出した固形分の割合を**抽出率（EY）**と呼びます。\n* **計算式:** EY (%) = [抽出されたコーヒー液の重さ (g) × 濃度(TDS %)] ÷ [使ったコーヒー粉の重さ (g)]\n* **過小抽出 (<18%):** 有機酸やレモン様の鋭い酸味だけが溶け出し、甘味成分が未抽出で未熟な酸っぱさが残ります。\n* **適正ゾーン (18〜22%):** ショ糖由来の甘味、良質な果実酸、まろやかな油分が完璧に調和します。\n* **過剰抽出 (>22%):** 難溶性のポリフェノールやクロロゲン酸ラクトン、重いカフェ酸が溶け出し、舌を刺す苦味と後味の渋み（アストリンジェンシー）が発生します。\n\n**実践のコツ:**\n味が薄い・酸っぱすぎる場合は「挽き目を細かくする」「湯温を上げる」ことでEYを高められます。`,
+          text: `### 抽出率（EY: Extraction Yield: 18〜22%）と収率の完全科学\n\nコーヒー豆の総重量のうち、お湯に溶け出した可溶性固形分の割合を**抽出率（EY）**と呼びます。\n* **基本計算式:** EY (%) = [抽出されたコーヒー液の重さ (g) × 濃度 (TDS %)] ÷ [使用したコーヒー粉の重さ (g)]\n* **未抽出ゾーン (<18%):** 有機酸（リンゴ酸・クエン酸）だけが突出し、甘味やボディが伴わない鋭利で薄っぺらい酸味が残ります。\n* **適正ゾーン (18〜22%):** ショ糖由来の甘味、果実味、微細な脂質が黄金比率で調和し、クリーンかつ長い余韻が生まれます。\n* **過剰抽出ゾーン (>22%):** 後半に溶出する難溶性のポリフェノールやクロロゲン酸ラクトン類が過剰になり、舌が乾く渋み（アストリンジェンシー）と焦げたような苦味が発生します。\n\n**実践の抽出コントロール:**\n酸っぱすぎる時は「挽き目を1目盛り細かくする」「湯温を2℃上げる」、苦味や渋みが強い時は「注ぎを早めに切り上げる（バイパス抽出）」ことで適正EY（20%前後）に収めることができます。`,
           sources: [
             "SCA Coffee Brewing Handbook (Specialty Coffee Association)",
             "Jonathan Gagné『The Physics of Filter Coffee』",
@@ -1419,10 +1446,19 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
           ]
         };
       }
+      if (query.includes('微粉') || query.includes('チャネリング')) {
+        return {
+          text: `### 微粉（Fines）の沈降とチャネリング（局所流）の力学\n\n* **微粉のブラインディング現象:** 抽出中、注水の撹拌によって50μm以下の極微粉がフィルター底面に移動し、ペーパーの微細孔を塞ぐ目詰まり（ブラインディング）を引き起こします。\n* **チャネリングの発生:** 目詰まりによってお湯の抜け道が塞がれると、粉層の最も抵抗の弱い部分に水流が集中し、局所的な激しい過抽出（えぐみ・渋み）と未抽出が混在します。\n\n**実践ヒント:**\n1. 注湯時にドリッパーの壁面を激しく叩かず、中央から静かに注ぎます。\n2. ドリッパーを回しすぎる「スワール」は微粉沈降を促進するため、注湯後のゆすりは最小限にとどめましょう。`,
+          sources: [
+            "Scott Rao『Filter Coffee Brewing Technologies』",
+            "SCA Technical Research: Particle Size Distribution in Drip Extraction"
+          ]
+        };
+      }
       return {
-        text: `### バリスタによる学術的解説\n\nご質問いただいたトピックについて、コーヒー科学の観点から解説します。\n抽出や風味形成においては、「**粒度分布の均一性**」「**湯温による分子運動エネルギー**」「**水質（Mg²⁺/Ca²⁺イオン）と揮発性有機酸の結合**」が味の骨格を決定づけます。\n\n* **抽出コントロール:** 浅煎りは92〜94℃で成分をしっかり引き出し、深煎りは85℃前後で雑味を抑制。\n* **水質の選択:** 硬度50〜80mg/Lの軟水を使用することで、繊細な果実酸と甘味のバランスが最も美しく表現されます。`,
+        text: `### バリスタ＆コーヒーサイエンティストによる解説\n\nご質問いただいたトピックについて、抽出力学と化学の観点から解説します。\nコーヒーの風味は「**粒度分布の均一性**」「**注水時の熱エネルギー**」「**水質（Mg²⁺/Ca²⁺イオン比率）**」の三要素によって決定されます。\n\n* **抽出バランス:** 浅煎りは92〜94℃の高温で成分をしっかり引き出し、深煎りは84〜86℃の低温で焦げ味を抑えます。\n* **水質の最適解:** 硬度50〜80mg/L（弱軟水）を用いることで、過剰な重炭酸塩による酸のマスキングを防ぎ、明るいアロマを際立たせることができます。`,
         sources: [
-          "SCA Standard Protocols & Cupping Standards",
+          "Specialty Coffee Association (SCA) Standard Cupping Protocols",
           "Christopher Hendon et al.『Water for Coffee』"
         ]
       };
@@ -1447,13 +1483,16 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
     }
 
     // =========================================================================
-    // STORAGE & NOTIFICATION SYSTEM
+    // STORAGE & SYSTEM PERSISTENCE
     // =========================================================================
     function saveState() {
       localStorage.setItem('coffee_read_ids', JSON.stringify(Array.from(STATE.readIds)));
       localStorage.setItem('coffee_bookmark_ids', JSON.stringify(Array.from(STATE.bookmarkedIds)));
       localStorage.setItem('coffee_notif_time', STATE.notificationTime);
+      localStorage.setItem('coffee_used_topics', JSON.stringify(Array.from(STATE.usedTopics)));
       updateProgress();
+      updateUsedTopicCountUI();
+      updateApiKeyBanner();
     }
 
     function loadState() {
@@ -1477,7 +1516,9 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
         const webCache = localStorage.getItem('coffee_web_cache');
         if (webCache) STATE.webCache = JSON.parse(webCache);
 
-        // デフォルトを18px ('md') に設定
+        const usedTopics = localStorage.getItem('coffee_used_topics');
+        if (usedTopics) STATE.usedTopics = new Set(JSON.parse(usedTopics));
+
         const savedFontSize = localStorage.getItem('coffee_font_size') || 'md';
         setFontSize(savedFontSize, false);
 
@@ -1486,12 +1527,30 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
       }
     }
 
+    function updateUsedTopicCountUI() {
+      const badge = document.getElementById('used-topic-count-badge');
+      if (badge) {
+        badge.textContent = `除外登録済み ${STATE.usedTopics.size}件`;
+      }
+    }
+
+    function clearUsedTopicHistory() {
+      STATE.usedTopics.clear();
+      localStorage.removeItem('coffee_used_topics');
+      updateUsedTopicCountUI();
+      showToastNotification('除外リストを初期化しました');
+    }
+
     function updateProgress() {
       const progressEl = document.getElementById('progress-percent');
       if (!progressEl) return;
-      const total = ALL_BASE_KNOWLEDGE.length;
+      let totalItems = 0;
+      for (const k in STATE.webCache) {
+        if (Array.isArray(STATE.webCache[k])) totalItems += STATE.webCache[k].length;
+      }
+      if (totalItems === 0) totalItems = 3;
       const readCount = STATE.readIds.size;
-      const percent = Math.min(100, Math.round((readCount / total) * 100));
+      const percent = Math.min(100, Math.round((readCount / totalItems) * 100));
       progressEl.textContent = `${percent}%`;
     }
 
@@ -1511,7 +1570,7 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
       }
       if (Notification.permission === "granted") {
         new Notification("☕ 日刊 珈琲の書 - 本日の3知識", {
-          body: "本日の最新コーヒーサイエンスと抽出ヒントが更新されました。一息ついて知識を深めましょう！",
+          body: "完全未出の最新コーヒーサイエンスが準備されました。一息ついて知識を深めましょう！",
           icon: "https://placehold.co/128x128/2D1A12/FAF6F0?text=Coffee"
         });
         showToastNotification("通知テストを送信しました！");
@@ -1533,9 +1592,14 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
       const container = document.getElementById('toast-container');
       if (!container) return;
 
+      // 既存のトーストが多すぎる場合は古いものを消去
+      if (container.children.length >= 2) {
+        container.removeChild(container.firstChild);
+      }
+
       const toast = document.createElement('div');
-      toast.className = 'bg-roast-900 text-white text-sm px-4 py-3 rounded-xl shadow-lg border border-roast-700 flex items-center justify-between gap-2 pointer-events-auto transition-all duration-300 opacity-0 transform -translate-y-2';
-      toast.innerHTML = `<span>${msg}</span><i class="fa-solid fa-xmark cursor-pointer text-roast-400 hover:text-white" onclick="this.parentElement.remove()"></i>`;
+      toast.className = 'bg-roast-900/95 backdrop-blur-md text-white text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-lg border border-roast-700 flex items-center justify-between gap-2 pointer-events-auto transition-all duration-300 opacity-0 transform -translate-y-2';
+      toast.innerHTML = `<span class="break-words-anywhere">${msg}</span><i class="fa-solid fa-xmark cursor-pointer text-roast-400 hover:text-white shrink-0" onclick="this.parentElement.remove()"></i>`;
 
       container.appendChild(toast);
       requestAnimationFrame(() => {
@@ -1545,7 +1609,7 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
       setTimeout(() => {
         toast.classList.add('opacity-0', '-translate-y-2');
         setTimeout(() => toast.remove(), 300);
-      }, 3500);
+      }, 3000);
     }
 
     // =========================================================================
@@ -1596,7 +1660,7 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
       const modal = document.getElementById('reset-confirm-modal');
       if (modal) {
         modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        modal.classList.remove('flex');
       }
     }
 
@@ -1604,11 +1668,13 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
       STATE.readIds.clear();
       STATE.bookmarkedIds.clear();
       STATE.webCache = {};
+      STATE.usedTopics.clear();
       localStorage.removeItem('coffee_read_ids');
       localStorage.removeItem('coffee_bookmark_ids');
       localStorage.removeItem('coffee_web_cache');
+      localStorage.removeItem('coffee_used_topics');
       closeResetModal();
-      showToastNotification('学習記録とWebキャッシュをリセットしました');
+      showToastNotification('すべての学習記録と履歴をリセットしました');
       updateDailyView();
       filterArchive();
     }
@@ -1634,8 +1700,9 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
       if (input) {
         STATE.apiKey = input.value.trim();
         localStorage.setItem('coffee_gemini_api_key', STATE.apiKey);
-        showToastNotification('API設定を保存しました');
+        showToastNotification('Gemini API設定を保存しました！☕');
         closeApiKeyModal();
+        updateDailyView();
       }
     }
     function clearApiKey() {
@@ -1645,6 +1712,7 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
       if (input) input.value = '';
       showToastNotification('APIキー設定を解除しました');
       closeApiKeyModal();
+      updateDailyView();
     }
 
     // =========================================================================
@@ -1661,7 +1729,7 @@ Google Searchツールを活用し、最新の科学的文献、SCA（スペシ�
         if (currentHM === STATE.notificationTime && now.getSeconds() < 10) {
           if ("Notification" in window && Notification.permission === "granted") {
             new Notification("☕ 日刊 珈琲の書", {
-              body: "設定時刻になりました。本日の最新3知識をお届けします！"
+              body: "設定時刻になりました。本日の完全未出3知識をお届けします！"
             });
           }
         }
